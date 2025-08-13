@@ -73,14 +73,14 @@ export const CounterCard: React.FC<CounterCardProps> = ({
           className="flex-1 flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2 md:py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors active:scale-95 transform text-sm md:text-base"
         >
           <Minus size={16} className="md:w-5 md:h-5" />
-          -{counter.decrement_step}
+          {counter.decrement_step}
         </button>
         <button
           onClick={onIncrement}
           className="flex-1 flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2 md:py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors active:scale-95 transform text-sm md:text-base"
         >
           <Plus size={16} className="md:w-5 md:h-5" />
-          +{counter.increment_step}
+          {counter.increment_step}
         </button>
       </div>
 
