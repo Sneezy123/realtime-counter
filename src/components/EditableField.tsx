@@ -99,7 +99,7 @@ export const EditableField: React.FC<EditableFieldProps> = ({
                     placeholder={placeholder}
                     min={minValue}
                     max={maxValue}
-                    className={`flex-1 px-2 py-1 border border-blue-300 dark:border-blue-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-card dark:bg-gray-800 text-foreground ${inputClassName}`}
+                    className={`flex-1 px-2 py-1 border border-blue-300 dark:border-blue-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-card dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${inputClassName}`}
                 />
                 <button
                     onClick={handleSave}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Key, Shield, AlertCircle } from 'lucide-react';
 import { generateAccessKey, isValidHexKey } from '../utils/securityUtils';
 import { supabase } from '../hooks/useSupabase';
+import logoIcon from '../logoVibeCount.svg';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -148,8 +149,11 @@ export const Home: React.FC = () => {
         <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
             <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full transition-colors duration-200'>
                 <div className='text-center mb-8'>
-                    <div className='bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
-                        <Users className='w-8 h-8 text-blue-600 dark:text-blue-400' />
+                    <div className='bg-gray-100 dark:bg-gray-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
+                        <img
+                            src={logoIcon}
+                            className='w-10 h-10 text-blue-600 dark:text-blue-400'
+                        />
                     </div>
                     <h1 className='font-display text-3xl font-bold text-gray-900 dark:text-white mb-2'>
                         VibeCount
