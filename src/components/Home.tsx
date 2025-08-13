@@ -11,6 +11,7 @@ export const Home: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [groupExists, setGroupExists] = useState(false);
     const [checkingGroup, setCheckingGroup] = useState(false);
+    const [accessKeyError, setAccessKeyError] = useState<string | null>(null);
 
     const handleGenerateKey = () => {
         setIsGenerating(true);
@@ -55,7 +56,7 @@ export const Home: React.FC = () => {
         return () => clearTimeout(debounceTimer);
     }, [groupName]);
 
-    const handleJoinGroup = (e: React.FormEvent) => {
+    const handleJoinGroup = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const trimmedGroupName = groupName.trim();
@@ -87,7 +88,60 @@ export const Home: React.FC = () => {
             return;
         }
 
-        navigate(`/${cleanGroupName}?key=${trimmedAccessKey}`);
+        // Check if group exists and validate access key
+        try {
+            const { data: group, error } = await supabase
+                .from('counter_groups')
+                .select('id, access_key_hash')
+                .eq('name', cleanGroupName)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                // PGRST116 is "no rows returned" - group doesn't exist
+                alert('Error checking group: ' + error.message);
+                return;
+            }
+
+            if (group) {
+                // Group exists - validate access key
+                const isValidKey = await validateGroupAccess(
+                    cleanGroupName,
+                    trimmedAccessKey
+                );
+
+                if (!isValidKey) {
+                    setAccessKeyError(
+                        'This group already exists and the access key is incorrect. Please use the correct key or choose a different group name.'
+                    );
+                    return;
+                }
+            }
+
+            // Either group doesn't exist (create) or key is valid (join)
+            setAccessKeyError(null);
+            navigate(`/${cleanGroupName}?key=${trimmedAccessKey}`);
+        } catch (err) {
+            setAccessKeyError(
+                'Error validating group access: ' + (err as Error).message
+            );
+        }
+    };
+
+    // Simple validation function - in production, use proper hashing
+    const validateGroupAccess = async (
+        groupName: string,
+        accessKey: string
+    ) => {
+        const { data } = await supabase
+            .from('counter_groups')
+            .select('access_key_hash')
+            .eq('name', groupName)
+            .single();
+
+        if (!data) return false;
+
+        // For demo purposes, we'll assume the key is stored as-is
+        return data.access_key_hash === accessKey;
     };
 
     return (
@@ -97,11 +151,12 @@ export const Home: React.FC = () => {
                     <div className='bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
                         <Users className='w-8 h-8 text-blue-600' />
                     </div>
-                    <h1 className='text-3xl font-bold text-gray-900 mb-2'>
-                        Counter Groups
+                    <h1 className='font-display text-3xl font-bold text-gray-900 mb-2'>
+                        VibeCount
                     </h1>
                     <p className='text-gray-600'>
-                        Create or join a real-time counter group
+                        Create or join a real-time group with counters for you
+                        and your friends, all in real-time!
                     </p>
                 </div>
 
@@ -117,14 +172,17 @@ export const Home: React.FC = () => {
                             type='text'
                             id='groupName'
                             value={groupName}
-                            onChange={(e) => setGroupName(e.target.value)}
+                            onChange={(e) => {
+                                setGroupName(e.target.value);
+                                setAccessKeyError(null);
+                            }}
                             placeholder='my-counter-group'
                             className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                         />
                         {groupExists && (
-                            <div className='mt-2 flex items-center text-red-600 text-sm'>
+                            <div className='mt-2 flex items-center text-blue-600 text-sm'>
                                 <AlertCircle className='w-4 h-4 mr-1' />
-                                <span>This group name already exists</span>
+                                <span>This group already exists</span>
                             </div>
                         )}
                     </div>
@@ -142,7 +200,10 @@ export const Home: React.FC = () => {
                                 type='text'
                                 id='accessKey'
                                 value={accessKey}
-                                onChange={(e) => setAccessKey(e.target.value)}
+                                onChange={(e) => {
+                                    setAccessKey(e.target.value);
+                                    setAccessKeyError(null);
+                                }}
                                 placeholder='Enter or generate an access key'
                                 className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                             />
@@ -157,26 +218,29 @@ export const Home: React.FC = () => {
                                 ? 'Generating...'
                                 : 'Generate Secure Key'}
                         </button>
+                        {accessKeyError && (
+                            <div className='mt-2 flex items-center text-red-600 text-sm'>
+                                <AlertCircle className='size-8 mr-1' />
+                                <span>{accessKeyError}</span>
+                            </div>
+                        )}
                     </div>
 
                     <button
                         type='submit'
                         className='w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:bg-gray-400'
-                        disabled={groupExists}
                     >
-                        {groupExists
-                            ? 'Group Already Exists'
-                            : 'Join/Create Group'}
+                        {groupExists ? 'Join Group' : 'Create Group'}
                     </button>
                 </form>
 
                 {groupExists && (
-                    <div className='mt-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
-                        <div className='flex items-center text-red-600 text-sm'>
+                    <div className='mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
+                        <div className='flex items-center text-blue-600 text-sm'>
                             <AlertCircle className='w-4 h-4 mr-2' />
                             <span>
-                                This group name already exists. Please choose a
-                                different name.
+                                This group already exists. Enter the correct
+                                access key to join.
                             </span>
                         </div>
                     </div>
