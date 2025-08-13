@@ -95,7 +95,7 @@ export const useRealTimeCounters = (groupId: string | null) => {
         supabase.removeChannel(newChannel);
       }
     };
-  }, [groupId, channel]);
+  }, [groupId]);
 
   const createCounter = useCallback(async () => {
     if (!groupId) return;
@@ -161,11 +161,13 @@ export const useRealTimeCounters = (groupId: string | null) => {
       const { error } = await supabase
         .from('counters')
         .delete()
-        .eq('id', counterId)
-        .select();
+        .eq('id', counterId);
 
       if (error) throw error;
       console.log('Counter deleted successfully');
+      
+      // Optimistic update: remove from state immediately
+      setCounters(prev => prev.filter(counter => counter.id !== counterId));
     } catch (err) {
       console.error('Error deleting counter:', err);
       setError(err instanceof Error ? err.message : 'Failed to delete counter');

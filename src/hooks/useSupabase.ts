@@ -9,6 +9,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export const createScopedSupabaseClient = (accessToken: string) => {
+    return createClient(supabaseUrl, supabaseAnonKey, {
+        global: {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+    });
+};
+
 export interface CounterGroup {
   id: string;
   name: string;

@@ -118,17 +118,28 @@ BEGIN
 END;
 $$;
 
+-- Helper function to get the group_id from a custom request header
+-- In your client, you would need to set this header for requests.
+-- See Supabase docs for passing custom data for RLS.
+CREATE OR REPLACE FUNCTION get_group_id_by_key(group_name text, access_key text)
+RETURNS uuid
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT id FROM counter_groups WHERE name = group_name AND access_key_hash = hash_access_key(access_key)
+$$;
+
 -- RLS Policies for counter_groups
 CREATE POLICY "Allow access with valid key" ON counter_groups
   FOR ALL
   TO anon, authenticated
-  USING (true);
+  USING (id = get_group_id_by_key(current_setting('request.headers', true)::json->>'x-group-name', current_setting('request.headers', true)::json->>'x-access-key'));
 
 -- RLS Policies for counters
 CREATE POLICY "Allow access with valid group" ON counters
   FOR ALL
   TO anon, authenticated
-  USING (true);
+  USING (group_id = get_group_id_by_key(current_setting('request.headers', true)::json->>'x-group-name', current_setting('request.headers', true)::json->>'x-access-key'));
 
 -- Update function to set updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
