@@ -96,12 +96,14 @@ export const CounterGroup: React.FC = () => {
 
     const copyShareUrl = async () => {
         const url = window.location.href;
+        console.log('Copying URL:', url);
         try {
             await navigator.clipboard.writeText(url);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy URL:', err);
+            alert('Failed to copy URL to clipboard. Please copy manually.');
         }
     };
 
