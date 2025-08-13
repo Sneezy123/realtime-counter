@@ -145,16 +145,16 @@ export const Home: React.FC = () => {
     };
 
     return (
-        <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'>
-            <div className='bg-white rounded-xl shadow-lg p-8 max-w-md w-full'>
+        <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
+            <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full transition-colors duration-200'>
                 <div className='text-center mb-8'>
-                    <div className='bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
-                        <Users className='w-8 h-8 text-blue-600' />
+                    <div className='bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
+                        <Users className='w-8 h-8 text-blue-600 dark:text-blue-400' />
                     </div>
-                    <h1 className='font-display text-3xl font-bold text-gray-900 mb-2'>
+                    <h1 className='font-display text-3xl font-bold text-gray-900 dark:text-white mb-2'>
                         VibeCount
                     </h1>
-                    <p className='text-gray-600'>
+                    <p className='text-gray-600 dark:text-gray-300'>
                         Create or join a real-time group with counters for you
                         and your friends, all in real-time!
                     </p>
@@ -164,7 +164,7 @@ export const Home: React.FC = () => {
                     <div>
                         <label
                             htmlFor='groupName'
-                            className='block text-sm font-medium text-gray-700 mb-2'
+                            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
                         >
                             Group Name
                         </label>
@@ -177,10 +177,10 @@ export const Home: React.FC = () => {
                                 setAccessKeyError(null);
                             }}
                             placeholder='my-counter-group'
-                            className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                            className='w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
                         />
                         {groupExists && (
-                            <div className='mt-2 flex items-center text-blue-600 text-sm'>
+                            <div className='mt-2 flex items-center text-blue-600 dark:text-blue-400 text-sm'>
                                 <AlertCircle className='w-4 h-4 mr-1' />
                                 <span>This group already exists</span>
                             </div>
@@ -190,12 +190,12 @@ export const Home: React.FC = () => {
                     <div>
                         <label
                             htmlFor='accessKey'
-                            className='block text-sm font-medium text-gray-700 mb-2'
+                            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
                         >
                             Access Key
                         </label>
                         <div className='relative'>
-                            <Key className='absolute left-3 top-2.5 w-5 h-5 text-gray-400' />
+                            <Key className='absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-gray-500' />
                             <input
                                 type='text'
                                 id='accessKey'
@@ -205,22 +205,22 @@ export const Home: React.FC = () => {
                                     setAccessKeyError(null);
                                 }}
                                 placeholder='Enter or generate an access key'
-                                className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                                className='w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
                             />
                         </div>
                         <button
                             type='button'
                             onClick={handleGenerateKey}
                             disabled={isGenerating}
-                            className='mt-2 w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors disabled:opacity-50'
+                            className='mt-2 w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors disabled:opacity-50'
                         >
                             {isGenerating
                                 ? 'Generating...'
                                 : 'Generate Secure Key'}
                         </button>
                         {accessKeyError && (
-                            <div className='mt-2 flex items-center text-red-600 text-sm'>
-                                <AlertCircle className='size-8 mr-1' />
+                            <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
+                                <AlertCircle className='w-4 h-4 mr-1' />
                                 <span>{accessKeyError}</span>
                             </div>
                         )}
@@ -228,15 +228,15 @@ export const Home: React.FC = () => {
 
                     <button
                         type='submit'
-                        className='w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:bg-gray-400'
+                        className='w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:bg-gray-400 dark:disabled:bg-gray-600'
                     >
                         {groupExists ? 'Join Group' : 'Create Group'}
                     </button>
                 </form>
 
                 {groupExists && (
-                    <div className='mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
-                        <div className='flex items-center text-blue-600 text-sm'>
+                    <div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                        <div className='flex items-center text-blue-600 dark:text-blue-400 text-sm'>
                             <AlertCircle className='w-4 h-4 mr-2' />
                             <span>
                                 This group already exists. Enter the correct

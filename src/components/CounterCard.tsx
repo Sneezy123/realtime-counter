@@ -25,19 +25,19 @@ export const CounterCard: React.FC<CounterCardProps> = ({
     };
 
     return (
-        <div className='bg-white rounded-xl shadow-md p-4 md:p-6 border border-gray-100 hover:shadow-lg transition-all duration-200 group'>
+        <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-200 group'>
             {/* Header with name and delete button */}
             <div className='flex items-center justify-between mb-3 md:mb-4'>
                 <EditableField
                     value={counter.name}
                     onSave={(value) => onUpdate({ name: value.toString() })}
                     placeholder='Counter Name'
-                    displayClassName='text-base md:text-lg font-semibold text-gray-900'
+                    displayClassName='text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100'
                     className='flex-1'
                 />
                 <button
                     onClick={handleDelete}
-                    className='p-2 text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200'
+                    className='p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200'
                     title='Delete Counter'
                 >
                     <Trash2 size={16} className='md:w-[18px] md:h-[18px]' />
@@ -52,7 +52,7 @@ export const CounterCard: React.FC<CounterCardProps> = ({
                         onUpdate({ description: value.toString() })
                     }
                     placeholder='Add a description...'
-                    displayClassName='text-sm text-gray-600'
+                    displayClassName='text-sm text-gray-600 dark:text-gray-400'
                 />
             </div>
 
@@ -62,7 +62,7 @@ export const CounterCard: React.FC<CounterCardProps> = ({
                     value={counter.value}
                     onSave={(value) => onUpdate({ value: Number(value) })}
                     type='number'
-                    displayClassName='text-3xl md:text-5xl font-bold text-blue-600'
+                    displayClassName='text-3xl md:text-5xl font-bold text-blue-600 dark:text-blue-400'
                     inputClassName='text-center text-2xl md:text-4xl font-bold'
                     className='justify-center'
                 />
@@ -72,14 +72,14 @@ export const CounterCard: React.FC<CounterCardProps> = ({
             <div className='flex gap-2 md:gap-3 mb-4 md:mb-6'>
                 <button
                     onClick={onDecrement}
-                    className='flex-1 flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2 md:py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors active:scale-95 transform text-sm md:text-base'
+                    className='flex-1 flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2 md:py-3 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-medium transition-colors active:scale-95 transform text-sm md:text-base'
                 >
                     <Minus size={16} className='md:w-5 md:h-5' />
                     {counter.decrement_step}
                 </button>
                 <button
                     onClick={onIncrement}
-                    className='flex-1 flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2 md:py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors active:scale-95 transform text-sm md:text-base'
+                    className='flex-1 flex items-center justify-center gap-1 md:gap-2 px-3 md:px-4 py-2 md:py-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white rounded-lg font-medium transition-colors active:scale-95 transform text-sm md:text-base'
                 >
                     <Plus size={16} className='md:w-5 md:h-5' />
                     {counter.increment_step}
@@ -89,7 +89,7 @@ export const CounterCard: React.FC<CounterCardProps> = ({
             {/* Step Controls */}
             <div className='grid grid-cols-2 gap-2 md:gap-4 text-xs md:text-sm'>
                 <div className='space-y-1 order-2 md:order-1'>
-                    <label className='text-gray-600 font-medium'>
+                    <label className='text-gray-600 dark:text-gray-400 font-medium'>
                         Decrement Step
                     </label>
                     <EditableField
@@ -99,12 +99,12 @@ export const CounterCard: React.FC<CounterCardProps> = ({
                         }
                         type='number'
                         minValue={1}
-                        displayClassName='text-gray-900 font-medium'
+                        displayClassName='text-gray-900 dark:text-gray-100 font-medium'
                         inputClassName='text-xs md:text-sm'
                     />
                 </div>
                 <div className='space-y-1 order-1 md:order-2'>
-                    <label className='text-gray-600 font-medium'>
+                    <label className='text-gray-600 dark:text-gray-400 font-medium'>
                         Increment Step
                     </label>
                     <EditableField
@@ -114,7 +114,7 @@ export const CounterCard: React.FC<CounterCardProps> = ({
                         }
                         type='number'
                         minValue={1}
-                        displayClassName='text-gray-900 font-medium'
+                        displayClassName='text-gray-900 dark:text-gray-100 font-medium'
                         inputClassName='text-xs md:text-sm'
                     />
                 </div>
