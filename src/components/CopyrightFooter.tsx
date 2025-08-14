@@ -1,6 +1,6 @@
 export default function CopyrightFooter() {
     return (
-        <div className='w-full fixed bottom-0 mb-4 flex flex-row justify-center'>
+        <div className='w-full flex flex-row pb-4 absolute bottom-0 justify-center'>
             <span className='flex flex-row gap-3 items-center text-gray-400 dark:text-gray-500'>
                 &copy; {new Date().getFullYear()} VibeCount. All rights
                 reserved.

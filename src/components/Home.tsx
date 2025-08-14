@@ -148,7 +148,7 @@ export const Home: React.FC = () => {
 
     return (
         <>
-            <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
+            <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full transition-colors duration-200'>
                     <div className='text-center mb-8'>
                         <div className='bg-gray-100 dark:bg-gray-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>

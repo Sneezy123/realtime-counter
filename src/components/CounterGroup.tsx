@@ -169,7 +169,7 @@ export const CounterGroup: React.FC = () => {
     }
 
     return (
-        <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
+        <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
             <div className='container mx-auto px-4 py-4 md:py-8 max-w-6xl'>
                 {/* Header */}
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transition-colors duration-200'>
