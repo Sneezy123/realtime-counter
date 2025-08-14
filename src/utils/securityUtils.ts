@@ -4,6 +4,14 @@ export const generateAccessKey = (): string => {
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 };
 
+export const hashAccessKey = async (accessKey: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(accessKey);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
 export const isValidHexKey = (key: string): boolean => {
   if (!key || typeof key !== 'string') {
     return false;
@@ -23,4 +31,12 @@ export const sanitizeInput = (input: string): string => {
               .replace(/on\w+\s*=/gi, '')
               .trim()
               .substring(0, 1000); // Limit length to prevent abuse
+};
+
+export const validateAccessKey = async (
+  providedKey: string,
+  storedHash: string
+): Promise<boolean> => {
+  const hashedKey = await hashAccessKey(providedKey);
+  return hashedKey === storedHash;
 };

@@ -4,7 +4,11 @@ import { Plus, Copy, Check, Users, AlertCircle, X, Edit3 } from 'lucide-react';
 import { supabase } from '../hooks/useSupabase';
 import { useRealTimeCounters } from '../hooks/useRealTimeCounters';
 import { getUserName, setUserName } from '../utils/userUtils';
-import { isValidHexKey } from '../utils/securityUtils';
+import {
+    isValidHexKey,
+    validateAccessKey,
+    hashAccessKey,
+} from '../utils/securityUtils';
 import { CounterCard } from './CounterCard';
 import CopyrightFooter from './CopyrightFooter';
 
@@ -21,6 +25,7 @@ export const CounterGroup: React.FC = () => {
     const [userName, setUserNameState] = useState(getUserName());
     const [isEditingName, setIsEditingName] = useState(false);
     const [editNameValue, setEditNameValue] = useState(userName);
+    const [copyError, setCopyError] = useState<string | null>(null);
 
     const {
         counters,
@@ -56,33 +61,46 @@ export const CounterGroup: React.FC = () => {
                     'with key:',
                     accessKey
                 );
-                const { data, error: rpcError } = await supabase.rpc(
-                    'create_or_get_group',
-                    {
-                        group_name: groupName,
-                        access_key_hash: accessKey,
+
+                // Get the group and validate the access key
+                const { data: group, error: groupError } = await supabase
+                    .from('counter_groups')
+                    .select('id, access_key_hash')
+                    .eq('name', groupName)
+                    .single();
+
+                if (groupError && groupError.code !== 'PGRST116') {
+                    throw groupError;
+                }
+
+                if (group) {
+                    // Group exists - validate access key
+                    const isValid = await validateAccessKey(
+                        accessKey,
+                        group.access_key_hash
+                    );
+                    if (!isValid) {
+                        setError('Invalid access key for this group');
+                        setLoading(false);
+                        return;
                     }
-                );
-
-                if (rpcError) {
-                    console.error('RPC Error:', rpcError);
-                    throw rpcError;
-                }
-
-                if (!data) {
-                    throw new Error(
-                        'Failed to create or access group: No data returned.'
-                    );
-                }
-
-                // The RPC function returns a UUID directly, not an object
-                if (typeof data === 'string') {
-                    console.log('Group validation successful, group ID:', data);
-                    setGroupId(data);
+                    setGroupId(group.id);
                 } else {
-                    throw new Error(
-                        'Invalid response format from group validation'
-                    );
+                    // Group doesn't exist - create it
+                    const { data: newGroup, error: createError } =
+                        await supabase
+                            .from('counter_groups')
+                            .insert({
+                                name: groupName,
+                                access_key_hash: await hashAccessKey(accessKey),
+                            })
+                            .select('id')
+                            .single();
+
+                    if (createError) {
+                        throw createError;
+                    }
+                    setGroupId(newGroup.id);
                 }
             } catch (err) {
                 console.error('Group validation error:', err);
@@ -96,15 +114,21 @@ export const CounterGroup: React.FC = () => {
     }, [groupName, accessKey]);
 
     const copyShareUrl = async () => {
-        const url = window.location.href;
+        if (!accessKey) return;
+
+        const url = `${window.location.origin}/${groupName}?key=${accessKey}`;
         console.log('Copying URL:', url);
         try {
             await navigator.clipboard.writeText(url);
             setCopied(true);
+            setCopyError(null);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy URL:', err);
-            alert('Failed to copy URL to clipboard. Please copy manually.');
+            setCopyError(
+                'Failed to copy URL to clipboard. Please copy manually.'
+            );
+            setTimeout(() => setCopyError(null), 3000);
         }
     };
 
@@ -147,7 +171,9 @@ export const CounterGroup: React.FC = () => {
 
     if (error) {
         return (
-            <div className='min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900 dark:to-pink-900 flex items-center justify-center p-4 transition-colors duration-200'>
+            /* #ffffff -> #fef2f2 = - #010d0d */
+            /* #000000 + #010d0d = #010d0d */
+            <div className='min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center transition-colors duration-200'>
                     <AlertCircle className='h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-4' />
                     <h1 className='text-2xl font-bold text-gray-900 dark:text-white mb-2'>
@@ -238,6 +264,11 @@ export const CounterGroup: React.FC = () => {
                                 )}
                                 {copied ? 'Copied!' : 'Share URL'}
                             </button>
+                            {copyError && (
+                                <div className='absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 text-sm text-red-600 dark:text-red-400'>
+                                    {copyError}
+                                </div>
+                            )}
 
                             <button
                                 onClick={createCounter}
@@ -246,6 +277,11 @@ export const CounterGroup: React.FC = () => {
                                 <Plus size={18} />
                                 Add Counter
                             </button>
+                            {copyError && (
+                                <div className='absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 text-sm text-red-600 dark:text-red-400'>
+                                    {copyError}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

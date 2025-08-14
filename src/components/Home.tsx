@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Key, Shield, AlertCircle } from 'lucide-react';
-import { generateAccessKey, isValidHexKey } from '../utils/securityUtils';
+import {
+    generateAccessKey,
+    isValidHexKey,
+    hashAccessKey,
+    validateAccessKey,
+} from '../utils/securityUtils';
 import { supabase } from '../hooks/useSupabase';
 import logoIcon from '../logoVibeCount.svg';
 import CopyrightFooter from './CopyrightFooter';
@@ -14,6 +19,8 @@ export const Home: React.FC = () => {
     const [groupExists, setGroupExists] = useState(false);
     const [checkingGroup, setCheckingGroup] = useState(false);
     const [accessKeyError, setAccessKeyError] = useState<string | null>(null);
+    const [groupNameError, setGroupNameError] = useState<string | null>(null);
+    const [formError, setFormError] = useState<string | null>(null);
 
     const handleGenerateKey = () => {
         setIsGenerating(true);
@@ -61,22 +68,27 @@ export const Home: React.FC = () => {
     const handleJoinGroup = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Clear previous errors
+        setGroupNameError(null);
+        setAccessKeyError(null);
+        setFormError(null);
+
         const trimmedGroupName = groupName.trim();
         const trimmedAccessKey = accessKey.trim();
 
+        let hasError = false;
+
         if (!trimmedGroupName) {
-            alert('Please enter a group name');
-            return;
+            setGroupNameError('Please enter a group name.');
+            hasError = true;
         }
 
         if (!trimmedAccessKey) {
-            alert('Please enter an access key');
-            return;
-        }
-
-        if (!isValidHexKey(trimmedAccessKey)) {
-            alert('Please enter a valid access key');
-            return;
+            setAccessKeyError('Access key not valid. Generate a new one.');
+            hasError = true;
+        } else if (!isValidHexKey(trimmedAccessKey)) {
+            setAccessKeyError('Access key not valid. Generate a new one.');
+            hasError = true;
         }
 
         // Clean group name for URL (allow letters, numbers, hyphens, underscores)
@@ -85,8 +97,14 @@ export const Home: React.FC = () => {
             .replace(/[^a-z0-9_-]/g, '-')
             .replace(/-+/g, '-');
 
-        if (!cleanGroupName || cleanGroupName === '-') {
-            alert('Group name must contain at least one letter or number');
+        if (trimmedGroupName && (!cleanGroupName || cleanGroupName === '-')) {
+            setGroupNameError(
+                'Group name must contain at least one letter or number'
+            );
+            hasError = true;
+        }
+
+        if (hasError) {
             return;
         }
 
@@ -100,7 +118,7 @@ export const Home: React.FC = () => {
 
             if (error && error.code !== 'PGRST116') {
                 // PGRST116 is "no rows returned" - group doesn't exist
-                alert('Error checking group: ' + error.message);
+                setFormError('Error checking group: ' + error.message);
                 return;
             }
 
@@ -121,29 +139,31 @@ export const Home: React.FC = () => {
 
             // Either group doesn't exist (create) or key is valid (join)
             setAccessKeyError(null);
+            setGroupNameError(null);
+            setFormError(null);
             navigate(`/${cleanGroupName}?key=${trimmedAccessKey}`);
         } catch (err) {
-            setAccessKeyError(
+            setFormError(
                 'Error validating group access: ' + (err as Error).message
             );
         }
     };
 
-    // Simple validation function - in production, use proper hashing
+    // Hash and salt validation function
     const validateGroupAccess = async (
         groupName: string,
         accessKey: string
     ) => {
-        const { data } = await supabase
+        const { data: groupData } = await supabase
             .from('counter_groups')
             .select('access_key_hash')
             .eq('name', groupName)
             .single();
 
-        if (!data) return false;
+        if (!groupData) return false;
 
-        // For demo purposes, we'll assume the key is stored as-is
-        return data.access_key_hash === accessKey;
+        // Use the new validateAccessKey function
+        return await validateAccessKey(accessKey, groupData.access_key_hash);
     };
 
     return (
@@ -161,8 +181,8 @@ export const Home: React.FC = () => {
                             VibeCount
                         </h1>
                         <p className='text-gray-600 dark:text-gray-300'>
-                            Create or join a real-time group with counters for
-                            you and your friends, all in real-time!
+                            Create or join a group with counters for anything
+                            imaginable! Secure and in real-time!
                         </p>
                     </div>
                     <form onSubmit={handleJoinGroup} className='space-y-6'>
@@ -180,14 +200,22 @@ export const Home: React.FC = () => {
                                 onChange={(e) => {
                                     setGroupName(e.target.value);
                                     setAccessKeyError(null);
+                                    setGroupNameError(null);
+                                    setFormError(null);
                                 }}
-                                placeholder='my-counter-group'
+                                placeholder='Name of your group'
                                 className='w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
                             />
                             {groupExists && (
                                 <div className='mt-2 flex items-center text-blue-600 dark:text-blue-400 text-sm'>
                                     <AlertCircle className='w-4 h-4 mr-1' />
                                     <span>This group already exists</span>
+                                </div>
+                            )}
+                            {groupNameError && (
+                                <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
+                                    <AlertCircle className='w-4 h-4 mr-1' />
+                                    <span>{groupNameError}</span>
                                 </div>
                             )}
                         </div>
@@ -207,8 +235,9 @@ export const Home: React.FC = () => {
                                     onChange={(e) => {
                                         setAccessKey(e.target.value);
                                         setAccessKeyError(null);
+                                        setFormError(null);
                                     }}
-                                    placeholder='Enter or generate an access key'
+                                    placeholder='Generate a secure access key'
                                     className='w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
                                 />
                             </div>
@@ -224,7 +253,7 @@ export const Home: React.FC = () => {
                             </button>
                             {accessKeyError && (
                                 <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
-                                    <AlertCircle className='w-4 h-4 mr-1' />
+                                    <AlertCircle className='h-4  mr-2' />
                                     <span>{accessKeyError}</span>
                                 </div>
                             )}
@@ -235,6 +264,14 @@ export const Home: React.FC = () => {
                         >
                             {groupExists ? 'Join Group' : 'Create Group'}
                         </button>
+                        {formError && (
+                            <div className='mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-sm text-red-600 dark:text-red-400'>
+                                <div className='flex items-center'>
+                                    <AlertCircle className='w-5 h-5 mr-2' />
+                                    <span>{formError}</span>
+                                </div>
+                            </div>
+                        )}
                     </form>
                     {groupExists && (
                         <div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
