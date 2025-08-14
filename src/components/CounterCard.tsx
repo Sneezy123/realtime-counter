@@ -95,7 +95,7 @@ export const CounterCard: React.FC<CounterCardProps> = ({
 
             {/* Step Controls */}
             <div className='grid grid-cols-2 gap-2 md:gap-4 text-xs md:text-sm'>
-                <div className='space-y-1 order-2 md:order-1'>
+                <div className='space-y-1 order-1 md:order-1'>
                     <label className='text-gray-600 dark:text-gray-400 font-medium'>
                         Decrement Step
                     </label>
@@ -110,7 +110,7 @@ export const CounterCard: React.FC<CounterCardProps> = ({
                         inputClassName='text-xs md:text-sm'
                     />
                 </div>
-                <div className='space-y-1 order-1 md:order-2'>
+                <div className='space-y-1 order-2 md:order-2'>
                     <label className='text-gray-600 dark:text-gray-400 font-medium'>
                         Increment Step
                     </label>
