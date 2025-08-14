@@ -2,6 +2,7 @@ import React from 'react';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { Counter } from '../hooks/useSupabase';
 import { EditableField } from './EditableField';
+import { Thumbnail } from './Thumbnail';
 
 interface CounterCardProps {
     counter: Counter;
@@ -25,7 +26,13 @@ export const CounterCard: React.FC<CounterCardProps> = ({
     };
 
     return (
-        <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-200 group'>
+        <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-200 group relative'>
+            {/* Thumbnail at the top */}
+            <Thumbnail
+                url={counter.thumbnail_url}
+                onUrlChange={(url) => onUpdate({ thumbnail_url: url })}
+            />
+
             {/* Header with name and delete button */}
             <div className='flex items-center justify-between mb-3 md:mb-4'>
                 <EditableField

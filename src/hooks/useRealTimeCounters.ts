@@ -131,7 +131,7 @@ export const useRealTimeCounters = (groupId: string | null) => {
     try {
       console.log('Updating counter:', counterId, updates);
       
-      // Sanitize text inputs
+      // Sanitize text inputs only (not URL fields)
       const sanitizedUpdates = { ...updates };
       if (updates.name) {
         sanitizedUpdates.name = sanitizeInput(updates.name);
@@ -139,15 +139,24 @@ export const useRealTimeCounters = (groupId: string | null) => {
       if (updates.description) {
         sanitizedUpdates.description = sanitizeInput(updates.description);
       }
+      
+      // Handle thumbnail_url - ensure it's a string or null, don't sanitize URLs
+      if (updates.thumbnail_url !== undefined) {
+        sanitizedUpdates.thumbnail_url = updates.thumbnail_url || null;
+      }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('counters')
         .update(sanitizedUpdates)
         .eq('id', counterId)
         .select();
 
-      if (error) throw error;
-      console.log('Counter updated successfully');
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
+      
+      console.log('Counter updated successfully:', data);
     } catch (err) {
       console.error('Error updating counter:', err);
       setError(err instanceof Error ? err.message : 'Failed to update counter');

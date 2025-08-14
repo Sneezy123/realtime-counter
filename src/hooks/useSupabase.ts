@@ -35,6 +35,7 @@ export interface Counter {
   value: number;
   increment_step: number;
   decrement_step: number;
+  thumbnail_url?: string | null;
   created_at: string;
   updated_at: string;
 }

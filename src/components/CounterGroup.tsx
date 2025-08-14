@@ -6,6 +6,7 @@ import { useRealTimeCounters } from '../hooks/useRealTimeCounters';
 import { getUserName, setUserName } from '../utils/userUtils';
 import { isValidHexKey } from '../utils/securityUtils';
 import { CounterCard } from './CounterCard';
+import CopyrightFooter from './CopyrightFooter';
 
 export const CounterGroup: React.FC = () => {
     const { groupName } = useParams<{ groupName: string }>();
@@ -162,6 +163,7 @@ export const CounterGroup: React.FC = () => {
                         Go Home
                     </button>
                 </div>
+                <CopyrightFooter />
             </div>
         );
     }
@@ -357,6 +359,7 @@ export const CounterGroup: React.FC = () => {
                     </>
                 )}
             </div>
+            <CopyrightFooter />
         </div>
     );
 };
