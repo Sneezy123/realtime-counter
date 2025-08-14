@@ -21,6 +21,9 @@ export const Home: React.FC = () => {
     const [accessKeyError, setAccessKeyError] = useState<string | null>(null);
     const [groupNameError, setGroupNameError] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
+    const [groupProfileImageUrl, setGroupProfileImageUrl] = useState<
+        string | null
+    >(null);
 
     const handleGenerateKey = () => {
         setIsGenerating(true);
@@ -30,11 +33,12 @@ export const Home: React.FC = () => {
         }, 300);
     };
 
-    // Check if group exists
+    // Check if group exists and fetch profile image
     useEffect(() => {
         const checkGroupExists = async () => {
             if (!groupName.trim()) {
                 setGroupExists(false);
+                setGroupProfileImageUrl(null);
                 return;
             }
 
@@ -48,14 +52,21 @@ export const Home: React.FC = () => {
 
                 const { data, error } = await supabase
                     .from('counter_groups')
-                    .select('id')
+                    .select('id, profile_image_url')
                     .eq('name', cleanGroupName)
                     .single();
 
-                setGroupExists(!!data && !error);
+                if (data && !error) {
+                    setGroupExists(true);
+                    setGroupProfileImageUrl(data.profile_image_url);
+                } else {
+                    setGroupExists(false);
+                    setGroupProfileImageUrl(null);
+                }
             } catch (err) {
                 // Group doesn't exist (single() throws error when no rows)
                 setGroupExists(false);
+                setGroupProfileImageUrl(null);
             } finally {
                 setCheckingGroup(false);
             }
@@ -173,8 +184,17 @@ export const Home: React.FC = () => {
                     <div className='text-center mb-8'>
                         <div className='bg-gray-100 dark:bg-gray-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
                             <img
-                                src={logoIcon}
-                                className='w-10 h-10 text-blue-600 dark:text-blue-400'
+                                src={groupProfileImageUrl || logoIcon}
+                                className={` text-blue-600 dark:text-blue-400 ${
+                                    groupExists
+                                        ? 'rounded-full object-cover w-full h-full'
+                                        : 'w-10 h-10'
+                                }`}
+                                alt={
+                                    groupExists
+                                        ? 'Group profile'
+                                        : 'VibeCount logo'
+                                }
                             />
                         </div>
                         <h1 className='font-display text-3xl font-bold text-gray-900 dark:text-white mb-2'>
@@ -191,7 +211,7 @@ export const Home: React.FC = () => {
                                 htmlFor='groupName'
                                 className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
                             >
-                                Group Name
+                                Unique Group Name
                             </label>
                             <input
                                 type='text'
@@ -203,7 +223,7 @@ export const Home: React.FC = () => {
                                     setGroupNameError(null);
                                     setFormError(null);
                                 }}
-                                placeholder='Name of your group'
+                                placeholder='Unique name of your group'
                                 className='w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
                             />
                             {groupExists && (
@@ -237,7 +257,11 @@ export const Home: React.FC = () => {
                                         setAccessKeyError(null);
                                         setFormError(null);
                                     }}
-                                    placeholder='Generate a secure access key'
+                                    placeholder={
+                                        groupExists
+                                            ? 'Secure access key of the group above'
+                                            : 'Generate a secure access key'
+                                    }
                                     className='w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
                                 />
                             </div>

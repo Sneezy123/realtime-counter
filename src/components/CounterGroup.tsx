@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Plus, Copy, Check, Users, AlertCircle, X, Edit3 } from 'lucide-react';
+import {
+    Plus,
+    Copy,
+    Check,
+    Users,
+    AlertCircle,
+    X,
+    Edit3,
+    Image as ImageIcon,
+} from 'lucide-react';
 import { supabase } from '../hooks/useSupabase';
 import { useRealTimeCounters } from '../hooks/useRealTimeCounters';
 import { getUserName, setUserName } from '../utils/userUtils';
@@ -11,6 +20,8 @@ import {
 } from '../utils/securityUtils';
 import { CounterCard } from './CounterCard';
 import CopyrightFooter from './CopyrightFooter';
+import { EditableField } from './EditableField';
+import { ProfilePicture } from './ProfilePicture';
 
 export const CounterGroup: React.FC = () => {
     const { groupName } = useParams<{ groupName: string }>();
@@ -19,6 +30,10 @@ export const CounterGroup: React.FC = () => {
 
     const accessKey = searchParams.get('key');
     const [groupId, setGroupId] = useState<string | null>(null);
+    const [groupDisplayName, setGroupDisplayName] = useState('');
+    const [groupProfileImageUrl, setGroupProfileImageUrl] = useState<
+        string | null
+    >(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -65,7 +80,9 @@ export const CounterGroup: React.FC = () => {
                 // Get the group and validate the access key
                 const { data: group, error: groupError } = await supabase
                     .from('counter_groups')
-                    .select('id, access_key_hash')
+                    .select(
+                        'id, access_key_hash, display_name, profile_image_url'
+                    )
                     .eq('name', groupName)
                     .single();
 
@@ -85,6 +102,8 @@ export const CounterGroup: React.FC = () => {
                         return;
                     }
                     setGroupId(group.id);
+                    setGroupDisplayName(group.display_name || groupName);
+                    setGroupProfileImageUrl(group.profile_image_url);
                 } else {
                     // Group doesn't exist - create it
                     const { data: newGroup, error: createError } =
@@ -92,6 +111,7 @@ export const CounterGroup: React.FC = () => {
                             .from('counter_groups')
                             .insert({
                                 name: groupName,
+                                display_name: groupName,
                                 access_key_hash: await hashAccessKey(accessKey),
                             })
                             .select('id')
@@ -101,6 +121,7 @@ export const CounterGroup: React.FC = () => {
                         throw createError;
                     }
                     setGroupId(newGroup.id);
+                    setGroupDisplayName(groupName);
                 }
             } catch (err) {
                 console.error('Group validation error:', err);
@@ -112,6 +133,31 @@ export const CounterGroup: React.FC = () => {
 
         validateAccess();
     }, [groupName, accessKey]);
+
+    const handleUpdateGroup = async (updates: {
+        display_name?: string | null;
+        profile_image_url?: string | null;
+    }) => {
+        if (!groupId) return;
+        try {
+            const { error } = await supabase
+                .from('counter_groups')
+                .update(updates)
+                .eq('id', groupId);
+
+            if (error) throw error;
+
+            if (updates.display_name) {
+                setGroupDisplayName(updates.display_name);
+            }
+            if (updates.profile_image_url !== undefined) {
+                setGroupProfileImageUrl(updates.profile_image_url);
+            }
+        } catch (err) {
+            console.error('Failed to update group:', err);
+            // Optionally, show an error to the user
+        }
+    };
 
     const copyShareUrl = async () => {
         if (!accessKey) return;
@@ -171,8 +217,6 @@ export const CounterGroup: React.FC = () => {
 
     if (error) {
         return (
-            /* #ffffff -> #fef2f2 = - #010d0d */
-            /* #000000 + #010d0d = #010d0d */
             <div className='min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center transition-colors duration-200'>
                     <AlertCircle className='h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-4' />
@@ -200,52 +244,77 @@ export const CounterGroup: React.FC = () => {
                 {/* Header */}
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transition-colors duration-200'>
                     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                        <div>
-                            <h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-                                {groupName}
-                            </h1>
-                            <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 group'>
-                                <Users size={16} />
-                                {isEditingName ? (
-                                    <div className='flex items-center gap-2'>
-                                        <input
-                                            type='text'
-                                            value={editNameValue}
-                                            onChange={(e) =>
-                                                setEditNameValue(e.target.value)
+                        <div className='flex items-center gap-4'>
+                            <div className='relative group'>
+                                <ProfilePicture
+                                    url={groupProfileImageUrl}
+                                    onUrlChange={(newUrl) =>
+                                        handleUpdateGroup({
+                                            profile_image_url: newUrl,
+                                        })
+                                    }
+                                    size={64}
+                                    className='rounded-full'
+                                />
+                            </div>
+                            <div>
+                                <EditableField
+                                    value={groupDisplayName}
+                                    onSave={(newName) =>
+                                        handleUpdateGroup({
+                                            display_name: newName as string,
+                                        })
+                                    }
+                                    placeholder='Group Name'
+                                    displayClassName='text-3xl font-bold text-gray-900 dark:text-white mb-2'
+                                />
+                                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 group'>
+                                    <Users size={16} />
+                                    {isEditingName ? (
+                                        <div className='flex items-center gap-2'>
+                                            <input
+                                                type='text'
+                                                value={editNameValue}
+                                                onChange={(e) =>
+                                                    setEditNameValue(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onKeyDown={handleNameKeyDown}
+                                                className='px-2 py-1 border border-blue-300 dark:border-blue-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
+                                                placeholder='Your name'
+                                                autoFocus
+                                            />
+                                            <button
+                                                onClick={handleSaveName}
+                                                className='p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded'
+                                                title='Save'
+                                            >
+                                                <Check size={14} />
+                                            </button>
+                                            <button
+                                                onClick={handleCancelNameEdit}
+                                                className='p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded'
+                                                title='Cancel'
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className='flex items-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 transition-colors'
+                                            onClick={() =>
+                                                setIsEditingName(true)
                                             }
-                                            onKeyDown={handleNameKeyDown}
-                                            className='px-2 py-1 border border-blue-300 dark:border-blue-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
-                                            placeholder='Your name'
-                                            autoFocus
-                                        />
-                                        <button
-                                            onClick={handleSaveName}
-                                            className='p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded'
-                                            title='Save'
                                         >
-                                            <Check size={14} />
-                                        </button>
-                                        <button
-                                            onClick={handleCancelNameEdit}
-                                            className='p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded'
-                                            title='Cancel'
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div
-                                        className='flex items-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 transition-colors'
-                                        onClick={() => setIsEditingName(true)}
-                                    >
-                                        <span>Signed in as {userName}</span>
-                                        <Edit3
-                                            size={12}
-                                            className='opacity-0 group-hover:opacity-100 transition-opacity'
-                                        />
-                                    </div>
-                                )}
+                                            <span>Signed in as {userName}</span>
+                                            <Edit3
+                                                size={12}
+                                                className='opacity-0 group-hover:opacity-100 transition-opacity'
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
