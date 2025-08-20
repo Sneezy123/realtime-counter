@@ -1,12 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/api/og/:groupName",
-      "destination": "/api/og/[groupName].ts"
+      "source": "/api/images/og-image.png",
+      "destination": "/og-image.png"
     },
     {
-        "source": "/api/images/og-image.png",
-        "destination": "/og-image.png"
+      "source": "/api/og/:groupName",
+      "destination": "/api/og/[groupName].ts"
     },
     {
       "source": "/(.*)",
