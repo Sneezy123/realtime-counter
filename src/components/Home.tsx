@@ -185,6 +185,14 @@ export const Home: React.FC = () => {
             {/* Head */}
             <Helmet>
                 <title>Home</title>
+                <meta
+                    name='description'
+                    content='Create your secure and real-time counters.'
+                />
+
+                {/* Facebook Meta Tags */}
+                <meta property='og:url' content={window.location.origin} />
+                <meta property='og:type' content='site' />
                 <meta property='og:title' content='VibeCount Home' />
                 <meta
                     property='og:description'
@@ -194,8 +202,19 @@ export const Home: React.FC = () => {
                     property='og:image'
                     content='https://picsum.dev/300/200'
                 />
-                <meta property='og:url' content={window.location.origin} />
-                <meta property='og:type' content='website' />
+
+                {/* Twitter Meta Tags */}
+                <meta name='twitter:card' content='summary_large_image' />
+                <meta property='twitter:url' content={window.location.origin} />
+                <meta name='twitter:title' content='site' />
+                <meta
+                    name='twitter:description'
+                    content='Create your secure and real-time counters.'
+                />
+                <meta
+                    name='twitter:image'
+                    content='https://picsum.dev/300/200'
+                />
             </Helmet>
             {/* Content */}
             <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>

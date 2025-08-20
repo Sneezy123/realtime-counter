@@ -213,7 +213,18 @@ export const CounterGroup: React.FC = () => {
             <>
                 <Helmet>
                     <title>Loading...</title>
-                    <meta property='og:title' content='Loading...' />
+                    <meta
+                        name='description'
+                        content='Loading counters for group...'
+                    />
+
+                    {/* Facebook Meta Tags */}
+                    <meta
+                        property='og:url'
+                        content='https://vibecount.vercel.app/'
+                    />
+                    <meta property='og:type' content='site' />
+                    <meta property='og:title' content='VibeCount' />
                     <meta
                         property='og:description'
                         content='Loading counters for group...'
@@ -222,11 +233,22 @@ export const CounterGroup: React.FC = () => {
                         property='og:image'
                         content='https://picsum.dev/300/200'
                     />
+
+                    {/* Twitter Meta Tags */}
+                    <meta name='twitter:card' content='summary_large_image' />
                     <meta
-                        property='og:url'
-                        content={`${window.location.origin}/${groupName}?key=${accessKey}`}
+                        property='twitter:url'
+                        content='https://vibecount.vercel.app/'
                     />
-                    <meta property='og:type' content='website' />
+                    <meta name='twitter:title' content='site' />
+                    <meta
+                        name='twitter:description'
+                        content='Loading counters for group...'
+                    />
+                    <meta
+                        name='twitter:image'
+                        content='https://picsum.dev/300/200'
+                    />
                 </Helmet>
                 <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center transition-colors duration-200'>
                     <div className='text-center'>
@@ -267,6 +289,17 @@ export const CounterGroup: React.FC = () => {
         <>
             <Helmet>
                 <title>{groupDisplayName}</title>
+                <meta
+                    name='description'
+                    content={`Counters for the group "${groupDisplayName}"`}
+                />
+
+                {/* Facebook Meta Tags */}
+                <meta
+                    property='og:url'
+                    content={`${window.location.origin}/${groupName}?key=${accessKey}`}
+                />
+                <meta property='og:type' content='site' />
                 <meta property='og:title' content={groupDisplayName} />
                 <meta
                     property='og:description'
@@ -276,11 +309,22 @@ export const CounterGroup: React.FC = () => {
                     property='og:image'
                     content='https://picsum.dev/300/200'
                 />
+
+                {/* Twitter Meta Tags */}
+                <meta name='twitter:card' content='summary_large_image' />
                 <meta
-                    property='og:url'
+                    property='twitter:url'
                     content={`${window.location.origin}/${groupName}?key=${accessKey}`}
                 />
-                <meta property='og:type' content='website' />
+                <meta name='twitter:title' content='site' />
+                <meta
+                    name='twitter:description'
+                    content={`Counters for the group "${groupDisplayName}"`}
+                />
+                <meta
+                    name='twitter:image'
+                    content='https://picsum.dev/300/200'
+                />
             </Helmet>
             <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
                 <div className='container mx-auto px-4 py-4 md:py-8 max-w-6xl'>
