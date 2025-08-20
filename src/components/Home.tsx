@@ -11,7 +11,6 @@ import { supabase } from '../hooks/useSupabase';
 import logoIcon from '../logoVibeCount.svg';
 import CopyrightFooter from './CopyrightFooter';
 import { JsxFlags } from 'typescript';
-import { Helmet } from 'react-helmet';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -181,174 +180,135 @@ export const Home: React.FC = () => {
     /* @endsection */
 
     return (
-        <>
-            {/* Head */}
-            <Helmet>
-                <title>Home</title>
-                <meta
-                    name='description'
-                    content='Create your secure and real-time counters.'
-                />
-
-                {/* Facebook Meta Tags */}
-                <meta property='og:url' content={window.location.origin} />
-                <meta property='og:type' content='site' />
-                <meta property='og:title' content='VibeCount Home' />
-                <meta
-                    property='og:description'
-                    content='Create your secure and real-time counters.'
-                />
-                <meta
-                    property='og:image'
-                    content='https://picsum.dev/300/200'
-                />
-
-                {/* Twitter Meta Tags */}
-                <meta name='twitter:card' content='summary_large_image' />
-                <meta property='twitter:url' content={window.location.origin} />
-                <meta name='twitter:title' content='site' />
-                <meta
-                    name='twitter:description'
-                    content='Create your secure and real-time counters.'
-                />
-                <meta
-                    name='twitter:image'
-                    content='https://picsum.dev/300/200'
-                />
-            </Helmet>
-            {/* Content */}
-            <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
-                <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full transition-colors duration-200'>
-                    <div className='text-center mb-8'>
-                        <div className='bg-gray-100 dark:bg-gray-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
-                            <img
-                                src={groupProfileImageUrl || logoIcon}
-                                className={` text-blue-600 dark:text-blue-400 ${
-                                    groupExists
-                                        ? 'rounded-full object-cover w-full h-full'
-                                        : 'w-10 h-10'
-                                }`}
-                                alt={
-                                    groupExists
-                                        ? 'Group profile'
-                                        : 'VibeCount logo'
-                                }
-                            />
-                        </div>
-                        <h1 className='font-display text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-                            VibeCount
-                        </h1>
-                        <p className='text-gray-600 dark:text-gray-300'>
-                            Create or join a group with counters for anything
-                            imaginable! Secure and in real-time!
-                        </p>
+        <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
+            <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full transition-colors duration-200'>
+                <div className='text-center mb-8'>
+                    <div className='bg-gray-100 dark:bg-gray-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4'>
+                        <img
+                            src={groupProfileImageUrl || logoIcon}
+                            className={` text-blue-600 dark:text-blue-400 ${
+                                groupExists
+                                    ? 'rounded-full object-cover w-full h-full'
+                                    : 'w-10 h-10'
+                            }`}
+                            alt={
+                                groupExists ? 'Group profile' : 'VibeCount logo'
+                            }
+                        />
                     </div>
-                    <form onSubmit={handleJoinGroup} className='space-y-6'>
-                        <div>
-                            <label
-                                htmlFor='groupName'
-                                className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
-                            >
-                                Unique Group Name
-                            </label>
-                            <input
-                                type='text'
-                                id='groupName'
-                                value={groupName}
-                                onChange={(e) => {
-                                    setGroupName(e.target.value);
-                                    setAccessKeyError(null);
-                                    setGroupNameError(null);
-                                    setFormError(null);
-                                }}
-                                placeholder='Unique name of your group'
-                                className='w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
-                            />
-                            {groupExists && (
-                                <div className='mt-2 flex items-center text-blue-600 dark:text-blue-400 text-sm'>
-                                    <AlertCircle className='w-4 h-4 mr-1' />
-                                    <span>This group already exists</span>
-                                </div>
-                            )}
-                            {groupNameError && (
-                                <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
-                                    <AlertCircle className='w-4 h-4 mr-1' />
-                                    <span>{groupNameError}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label
-                                htmlFor='accessKey'
-                                className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
-                            >
-                                Access Key
-                            </label>
-                            <div className='relative'>
-                                <Key className='absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-gray-500' />
-                                <input
-                                    type='text'
-                                    id='accessKey'
-                                    value={accessKey}
-                                    onChange={(e) => {
-                                        setAccessKey(e.target.value);
-                                        setAccessKeyError(null);
-                                        setFormError(null);
-                                    }}
-                                    placeholder={
-                                        groupExists
-                                            ? 'Secure access key of the group above'
-                                            : 'Generate a secure access key'
-                                    }
-                                    className='w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
-                                />
-                            </div>
-                            <button
-                                type='button'
-                                onClick={handleGenerateKey}
-                                disabled={isGenerating}
-                                className='mt-2 w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors disabled:opacity-50'
-                            >
-                                {isGenerating
-                                    ? 'Generating...'
-                                    : 'Generate Secure Key'}
-                            </button>
-                            {accessKeyError && (
-                                <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
-                                    <AlertCircle className='h-4  mr-2' />
-                                    <span>{accessKeyError}</span>
-                                </div>
-                            )}
-                        </div>
-                        <button
-                            type='submit'
-                            className='w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:bg-gray-400 dark:disabled:bg-gray-600'
+                    <h1 className='font-display text-3xl font-bold text-gray-900 dark:text-white mb-2'>
+                        VibeCount
+                    </h1>
+                    <p className='text-gray-600 dark:text-gray-300'>
+                        Create or join a group with counters for anything
+                        imaginable! Secure and in real-time!
+                    </p>
+                </div>
+                <form onSubmit={handleJoinGroup} className='space-y-6'>
+                    <div>
+                        <label
+                            htmlFor='groupName'
+                            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
                         >
-                            {groupExists ? 'Join Group' : 'Create Group'}
-                        </button>
-                        {formError && (
-                            <div className='mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-sm text-red-600 dark:text-red-400'>
-                                <div className='flex items-center'>
-                                    <AlertCircle className='w-5 h-5 mr-2' />
-                                    <span>{formError}</span>
-                                </div>
+                            Unique Group Name
+                        </label>
+                        <input
+                            type='text'
+                            id='groupName'
+                            value={groupName}
+                            onChange={(e) => {
+                                setGroupName(e.target.value);
+                                setAccessKeyError(null);
+                                setGroupNameError(null);
+                                setFormError(null);
+                            }}
+                            placeholder='Unique name of your group'
+                            className='w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
+                        />
+                        {groupExists && (
+                            <div className='mt-2 flex items-center text-blue-600 dark:text-blue-400 text-sm'>
+                                <AlertCircle className='w-4 h-4 mr-1' />
+                                <span>This group already exists</span>
                             </div>
                         )}
-                    </form>
-                    {groupExists && (
-                        <div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-                            <div className='flex items-center text-blue-600 dark:text-blue-400 text-sm'>
-                                <AlertCircle className='w-4 h-4 mr-2' />
-                                <span>
-                                    This group already exists. Enter the correct
-                                    access key to join.
-                                </span>
+                        {groupNameError && (
+                            <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
+                                <AlertCircle className='w-4 h-4 mr-1' />
+                                <span>{groupNameError}</span>
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label
+                            htmlFor='accessKey'
+                            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
+                        >
+                            Access Key
+                        </label>
+                        <div className='relative'>
+                            <Key className='absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-gray-500' />
+                            <input
+                                type='text'
+                                id='accessKey'
+                                value={accessKey}
+                                onChange={(e) => {
+                                    setAccessKey(e.target.value);
+                                    setAccessKeyError(null);
+                                    setFormError(null);
+                                }}
+                                placeholder={
+                                    groupExists
+                                        ? 'Secure access key of the group above'
+                                        : 'Generate a secure access key'
+                                }
+                                className='w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200'
+                            />
+                        </div>
+                        <button
+                            type='button'
+                            onClick={handleGenerateKey}
+                            disabled={isGenerating}
+                            className='mt-2 w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors disabled:opacity-50'
+                        >
+                            {isGenerating
+                                ? 'Generating...'
+                                : 'Generate Secure Key'}
+                        </button>
+                        {accessKeyError && (
+                            <div className='mt-2 flex items-center text-red-600 dark:text-red-400 text-sm'>
+                                <AlertCircle className='h-4  mr-2' />
+                                <span>{accessKeyError}</span>
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        type='submit'
+                        className='w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:bg-gray-400 dark:disabled:bg-gray-600'
+                    >
+                        {groupExists ? 'Join Group' : 'Create Group'}
+                    </button>
+                    {formError && (
+                        <div className='mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-sm text-red-600 dark:text-red-400'>
+                            <div className='flex items-center'>
+                                <AlertCircle className='w-5 h-5 mr-2' />
+                                <span>{formError}</span>
                             </div>
                         </div>
                     )}
-                </div>
-                <CopyrightFooter />
+                </form>
+                {groupExists && (
+                    <div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                        <div className='flex items-center text-blue-600 dark:text-blue-400 text-sm'>
+                            <AlertCircle className='w-4 h-4 mr-2' />
+                            <span>
+                                This group already exists. Enter the correct
+                                access key to join.
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
-        </>
+            <CopyrightFooter />
+        </div>
     );
 };

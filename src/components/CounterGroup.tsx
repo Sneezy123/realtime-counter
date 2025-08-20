@@ -22,7 +22,6 @@ import { CounterCard } from './CounterCard';
 import CopyrightFooter from './CopyrightFooter';
 import { EditableField } from './EditableField';
 import { ProfilePicture } from './ProfilePicture';
-import { Helmet } from 'react-helmet';
 
 export const CounterGroup: React.FC = () => {
     // @section: Hook Definitions
@@ -210,55 +209,14 @@ export const CounterGroup: React.FC = () => {
 
     if (loading) {
         return (
-            <>
-                <Helmet>
-                    <title>Loading...</title>
-                    <meta
-                        name='description'
-                        content='Loading counters for group...'
-                    />
-
-                    {/* Facebook Meta Tags */}
-                    <meta
-                        property='og:url'
-                        content='https://vibecount.vercel.app/'
-                    />
-                    <meta property='og:type' content='site' />
-                    <meta property='og:title' content='VibeCount' />
-                    <meta
-                        property='og:description'
-                        content='Loading counters for group...'
-                    />
-                    <meta
-                        property='og:image'
-                        content='https://picsum.dev/300/200'
-                    />
-
-                    {/* Twitter Meta Tags */}
-                    <meta name='twitter:card' content='summary_large_image' />
-                    <meta
-                        property='twitter:url'
-                        content='https://vibecount.vercel.app/'
-                    />
-                    <meta name='twitter:title' content='site' />
-                    <meta
-                        name='twitter:description'
-                        content='Loading counters for group...'
-                    />
-                    <meta
-                        name='twitter:image'
-                        content='https://picsum.dev/300/200'
-                    />
-                </Helmet>
-                <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center transition-colors duration-200'>
-                    <div className='text-center'>
-                        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4'></div>
-                        <p className='text-gray-600 dark:text-gray-300'>
-                            Loading group...
-                        </p>
-                    </div>
+            <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center transition-colors duration-200'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4'></div>
+                    <p className='text-gray-600 dark:text-gray-300'>
+                        Loading group...
+                    </p>
                 </div>
-            </>
+            </div>
         );
     }
 
@@ -286,286 +244,232 @@ export const CounterGroup: React.FC = () => {
     }
 
     return (
-        <>
-            <Helmet>
-                <title>{groupDisplayName}</title>
-                <meta
-                    name='description'
-                    content={`Counters for the group "${groupDisplayName}"`}
-                />
-
-                {/* Facebook Meta Tags */}
-                <meta
-                    property='og:url'
-                    content={`${window.location.origin}/${groupName}?key=${accessKey}`}
-                />
-                <meta property='og:type' content='site' />
-                <meta property='og:title' content={groupDisplayName} />
-                <meta
-                    property='og:description'
-                    content={`Counters for the group "${groupDisplayName}"`}
-                />
-                <meta
-                    property='og:image'
-                    content='https://picsum.dev/300/200'
-                />
-
-                {/* Twitter Meta Tags */}
-                <meta name='twitter:card' content='summary_large_image' />
-                <meta
-                    property='twitter:url'
-                    content={`${window.location.origin}/${groupName}?key=${accessKey}`}
-                />
-                <meta name='twitter:title' content='site' />
-                <meta
-                    name='twitter:description'
-                    content={`Counters for the group "${groupDisplayName}"`}
-                />
-                <meta
-                    name='twitter:image'
-                    content='https://picsum.dev/300/200'
-                />
-            </Helmet>
-            <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
-                <div className='container mx-auto px-4 py-4 md:py-8 max-w-6xl'>
-                    {/* Header */}
-                    <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transition-colors duration-200'>
-                        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                            <div className='flex items-center gap-4'>
-                                <div className='relative group'>
-                                    <ProfilePicture
-                                        url={groupProfileImageUrl}
-                                        onUrlChange={(newUrl) =>
-                                            handleUpdateGroup({
-                                                profile_image_url: newUrl,
-                                            })
-                                        }
-                                        size={64}
-                                        className='rounded-full'
-                                    />
-                                </div>
-                                <div>
-                                    <EditableField
-                                        value={groupDisplayName}
-                                        onSave={(newName) =>
-                                            handleUpdateGroup({
-                                                display_name: newName as string,
-                                            })
-                                        }
-                                        placeholder='Group Name'
-                                        displayClassName='text-3xl font-bold text-gray-900 dark:text-white mb-2'
-                                    />
-                                    <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 group'>
-                                        <Users size={16} />
-                                        {isEditingName ? (
-                                            <div className='flex items-center gap-2'>
-                                                <input
-                                                    type='text'
-                                                    value={editNameValue}
-                                                    onChange={(e) =>
-                                                        setEditNameValue(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    onKeyDown={
-                                                        handleNameKeyDown
-                                                    }
-                                                    className='px-2 py-1 border border-blue-300 dark:border-blue-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
-                                                    placeholder='Your name'
-                                                    autoFocus
-                                                />
-                                                <button
-                                                    onClick={handleSaveName}
-                                                    className='p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded'
-                                                    title='Save'
-                                                >
-                                                    <Check size={14} />
-                                                </button>
-                                                <button
-                                                    onClick={
-                                                        handleCancelNameEdit
-                                                    }
-                                                    className='p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded'
-                                                    title='Cancel'
-                                                >
-                                                    <X size={14} />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className='flex items-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 transition-colors'
-                                                onClick={() =>
-                                                    setIsEditingName(true)
+        <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
+            <div className='container mx-auto px-4 py-4 md:py-8 max-w-6xl'>
+                {/* Header */}
+                <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transition-colors duration-200'>
+                    <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+                        <div className='flex items-center gap-4'>
+                            <div className='relative group'>
+                                <ProfilePicture
+                                    url={groupProfileImageUrl}
+                                    onUrlChange={(newUrl) =>
+                                        handleUpdateGroup({
+                                            profile_image_url: newUrl,
+                                        })
+                                    }
+                                    size={64}
+                                    className='rounded-full'
+                                />
+                            </div>
+                            <div>
+                                <EditableField
+                                    value={groupDisplayName}
+                                    onSave={(newName) =>
+                                        handleUpdateGroup({
+                                            display_name: newName as string,
+                                        })
+                                    }
+                                    placeholder='Group Name'
+                                    displayClassName='text-3xl font-bold text-gray-900 dark:text-white mb-2'
+                                />
+                                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 group'>
+                                    <Users size={16} />
+                                    {isEditingName ? (
+                                        <div className='flex items-center gap-2'>
+                                            <input
+                                                type='text'
+                                                value={editNameValue}
+                                                onChange={(e) =>
+                                                    setEditNameValue(
+                                                        e.target.value
+                                                    )
                                                 }
+                                                onKeyDown={handleNameKeyDown}
+                                                className='px-2 py-1 border border-blue-300 dark:border-blue-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
+                                                placeholder='Your name'
+                                                autoFocus
+                                            />
+                                            <button
+                                                onClick={handleSaveName}
+                                                className='p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded'
+                                                title='Save'
                                             >
-                                                <span>
-                                                    Signed in as {userName}
-                                                </span>
-                                                <Edit3
-                                                    size={12}
-                                                    className='opacity-0 group-hover:opacity-100 transition-opacity'
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='flex flex-col sm:flex-row gap-2 md:gap-3'>
-                                <button
-                                    onClick={copyShareUrl}
-                                    className='flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors text-sm md:text-base'
-                                >
-                                    {copied ? (
-                                        <Check
-                                            size={18}
-                                            className='text-green-600 dark:text-green-400'
-                                        />
+                                                <Check size={14} />
+                                            </button>
+                                            <button
+                                                onClick={handleCancelNameEdit}
+                                                className='p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded'
+                                                title='Cancel'
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
                                     ) : (
-                                        <Copy size={18} />
+                                        <div
+                                            className='flex items-center gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-2 py-1 transition-colors'
+                                            onClick={() =>
+                                                setIsEditingName(true)
+                                            }
+                                        >
+                                            <span>Signed in as {userName}</span>
+                                            <Edit3
+                                                size={12}
+                                                className='opacity-0 group-hover:opacity-100 transition-opacity'
+                                            />
+                                        </div>
                                     )}
-                                    {copied ? 'Copied!' : 'Share URL'}
-                                </button>
-                                {copyError && (
-                                    <div className='absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 text-sm text-red-600 dark:text-red-400'>
-                                        {copyError}
-                                    </div>
-                                )}
-
-                                <button
-                                    onClick={createCounter}
-                                    className='flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm md:text-base'
-                                >
-                                    <Plus size={18} />
-                                    Add Counter
-                                </button>
-                                {copyError && (
-                                    <div className='absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 text-sm text-red-600 dark:text-red-400'>
-                                        {copyError}
-                                    </div>
-                                )}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Error Display */}
-                    {countersError && (
-                        <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6 transition-colors duration-200'>
-                            <div className='flex items-center justify-between'>
-                                <div className='flex items-center gap-2'>
-                                    <AlertCircle
+                        <div className='flex flex-col sm:flex-row gap-2 md:gap-3'>
+                            <button
+                                onClick={copyShareUrl}
+                                className='flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors text-sm md:text-base'
+                            >
+                                {copied ? (
+                                    <Check
                                         size={18}
-                                        className='text-red-600 dark:text-red-400'
+                                        className='text-green-600 dark:text-green-400'
                                     />
-                                    <p className='text-red-800 dark:text-red-300'>
-                                        {countersError}
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={clearError}
-                                    className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300'
-                                >
-                                    <X size={18} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Loading State */}
-                    {countersLoading ? (
-                        <div className='text-center py-12'>
-                            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4'></div>
-                            <p className='text-gray-600 dark:text-gray-300'>
-                                Loading counters...
-                            </p>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Counters Grid */}
-                            {counters.length > 0 ? (
-                                <div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
-                                    {counters.map((counter) => (
-                                        <CounterCard
-                                            key={counter.id}
-                                            counter={counter}
-                                            onUpdate={async (updates) => {
-                                                try {
-                                                    await updateCounter(
-                                                        counter.id,
-                                                        updates
-                                                    );
-                                                } catch (err) {
-                                                    console.error(
-                                                        'Failed to update counter:',
-                                                        err
-                                                    );
-                                                }
-                                            }}
-                                            onIncrement={async () => {
-                                                try {
-                                                    await incrementCounter(
-                                                        counter
-                                                    );
-                                                } catch (err) {
-                                                    console.error(
-                                                        'Failed to increment counter:',
-                                                        err
-                                                    );
-                                                }
-                                            }}
-                                            onDecrement={async () => {
-                                                try {
-                                                    await decrementCounter(
-                                                        counter
-                                                    );
-                                                } catch (err) {
-                                                    console.error(
-                                                        'Failed to decrement counter:',
-                                                        err
-                                                    );
-                                                }
-                                            }}
-                                            onDelete={async () => {
-                                                try {
-                                                    await deleteCounter(
-                                                        counter.id
-                                                    );
-                                                } catch (err) {
-                                                    console.error(
-                                                        'Failed to delete counter:',
-                                                        err
-                                                    );
-                                                }
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                            ) : (
-                                /* Empty State */
-                                <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 md:p-12 text-center transition-colors duration-200'>
-                                    <div className='text-gray-400 dark:text-gray-500 mb-4'>
-                                        <Plus size={48} className='mx-auto' />
-                                    </div>
-                                    <h3 className='text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2'>
-                                        No counters yet
-                                    </h3>
-                                    <p className='text-gray-600 dark:text-gray-300 mb-6'>
-                                        Create your first counter to get
-                                        started!
-                                    </p>
-                                    <button
-                                        onClick={createCounter}
-                                        className='px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
-                                    >
-                                        Create First Counter
-                                    </button>
+                                ) : (
+                                    <Copy size={18} />
+                                )}
+                                {copied ? 'Copied!' : 'Share URL'}
+                            </button>
+                            {copyError && (
+                                <div className='absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 text-sm text-red-600 dark:text-red-400'>
+                                    {copyError}
                                 </div>
                             )}
-                        </>
-                    )}
+
+                            <button
+                                onClick={createCounter}
+                                className='flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm md:text-base'
+                            >
+                                <Plus size={18} />
+                                Add Counter
+                            </button>
+                            {copyError && (
+                                <div className='absolute top-full mt-2 left-0 right-0 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2 text-sm text-red-600 dark:text-red-400'>
+                                    {copyError}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
-                <CopyrightFooter />
+
+                {/* Error Display */}
+                {countersError && (
+                    <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6 transition-colors duration-200'>
+                        <div className='flex items-center justify-between'>
+                            <div className='flex items-center gap-2'>
+                                <AlertCircle
+                                    size={18}
+                                    className='text-red-600 dark:text-red-400'
+                                />
+                                <p className='text-red-800 dark:text-red-300'>
+                                    {countersError}
+                                </p>
+                            </div>
+                            <button
+                                onClick={clearError}
+                                className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300'
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {countersLoading ? (
+                    <div className='text-center py-12'>
+                        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4'></div>
+                        <p className='text-gray-600 dark:text-gray-300'>
+                            Loading counters...
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        {/* Counters Grid */}
+                        {counters.length > 0 ? (
+                            <div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
+                                {counters.map((counter) => (
+                                    <CounterCard
+                                        key={counter.id}
+                                        counter={counter}
+                                        onUpdate={async (updates) => {
+                                            try {
+                                                await updateCounter(
+                                                    counter.id,
+                                                    updates
+                                                );
+                                            } catch (err) {
+                                                console.error(
+                                                    'Failed to update counter:',
+                                                    err
+                                                );
+                                            }
+                                        }}
+                                        onIncrement={async () => {
+                                            try {
+                                                await incrementCounter(counter);
+                                            } catch (err) {
+                                                console.error(
+                                                    'Failed to increment counter:',
+                                                    err
+                                                );
+                                            }
+                                        }}
+                                        onDecrement={async () => {
+                                            try {
+                                                await decrementCounter(counter);
+                                            } catch (err) {
+                                                console.error(
+                                                    'Failed to decrement counter:',
+                                                    err
+                                                );
+                                            }
+                                        }}
+                                        onDelete={async () => {
+                                            try {
+                                                await deleteCounter(counter.id);
+                                            } catch (err) {
+                                                console.error(
+                                                    'Failed to delete counter:',
+                                                    err
+                                                );
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            /* Empty State */
+                            <div className='bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 md:p-12 text-center transition-colors duration-200'>
+                                <div className='text-gray-400 dark:text-gray-500 mb-4'>
+                                    <Plus size={48} className='mx-auto' />
+                                </div>
+                                <h3 className='text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2'>
+                                    No counters yet
+                                </h3>
+                                <p className='text-gray-600 dark:text-gray-300 mb-6'>
+                                    Create your first counter to get started!
+                                </p>
+                                <button
+                                    onClick={createCounter}
+                                    className='px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
+                                >
+                                    Create First Counter
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
-        </>
+            <CopyrightFooter />
+        </div>
     );
 };
