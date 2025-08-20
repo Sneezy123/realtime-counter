@@ -10,6 +10,8 @@ import {
 import { supabase } from '../hooks/useSupabase';
 import logoIcon from '../logoVibeCount.svg';
 import CopyrightFooter from './CopyrightFooter';
+import { JsxFlags } from 'typescript';
+import { Helmet } from 'react-helmet';
 
 export const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -24,7 +26,7 @@ export const Home: React.FC = () => {
     const [groupProfileImageUrl, setGroupProfileImageUrl] = useState<
         string | null
     >(null);
-
+    /* @section: Utility functions */
     const handleGenerateKey = () => {
         setIsGenerating(true);
         setTimeout(() => {
@@ -176,9 +178,26 @@ export const Home: React.FC = () => {
         // Use the new validateAccessKey function
         return await validateAccessKey(accessKey, groupData.access_key_hash);
     };
+    /* @endsection */
 
     return (
         <>
+            {/* Head */}
+            <Helmet>
+                <title>Home</title>
+                <meta property='og:title' content='VibeCount Home' />
+                <meta
+                    property='og:description'
+                    content='Create your secure and real-time counters.'
+                />
+                <meta
+                    property='og:image'
+                    content='https://picsum.dev/300/200'
+                />
+                <meta property='og:url' content={window.location.origin} />
+                <meta property='og:type' content='website' />
+            </Helmet>
+            {/* Content */}
             <div className='min-h-screen relative pb-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-200'>
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full transition-colors duration-200'>
                     <div className='text-center mb-8'>
