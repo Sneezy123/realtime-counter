@@ -1,20 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="shortcut icon" type="image/svg+xml" href="/src/logoVibeCount.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Cache-Control" content="no-store" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>VibeCount</title>
-    <!-- Add favicon -->
-  </head>
-  <body style="background-color: oklch(97% 0.014 254.604);">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx" crossorigin="anonymous"></script>
-    <script>
-      console.log("index.html loaded and JavaScript is executing!");
-    </script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link
+            rel="shortcut icon"
+            type="image/svg+xml"
+            href="/src/logoVibeCount.svg"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Cache-Control" content="no-store" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        <title>VibeCount</title>
+
+        <meta
+            name="description"
+            content="Create your secure and real-time counters."
+        />
+
+        {/* Facebook Meta Tags */}
+        <meta property="og:url" content="{window.location.origin}" />
+        <meta property="og:type" content="site" />
+        <meta property="og:title" content="VibeCount Home" />
+        <meta
+            property="og:description"
+            content="Create your secure and real-time counters."
+        />
+        <meta property="og:image" content="https://picsum.dev/300/200" />
+
+        {/* Twitter Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="{window.location.origin}" />
+        <meta name="twitter:title" content="site" />
+        <meta
+            name="twitter:description"
+            content="Create your secure and real-time counters."
+        />
+        <meta name="twitter:image" content="https://picsum.dev/300/200" />
+        <!-- Add favicon -->
+    </head>
+    <body style="background-color: oklch(97% 0.014 254.604)">
+        <div id="root"></div>
+        <script
+            type="module"
+            src="/src/main.tsx"
+            crossorigin="anonymous"
+        ></script>
+        <script>
+            console.log('index.html loaded and JavaScript is executing!');
+        </script>
+    </body>
 </html>
