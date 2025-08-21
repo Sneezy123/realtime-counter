@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/og/:groupName",
-      "destination": "/api/og/[groupName].ts"
+      "destination": "/api/og/[groupName]"
     },
     {
       "source": "/(.*)",

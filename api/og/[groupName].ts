@@ -3,23 +3,31 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
-export default async function handler(req, res) {
-    const { groupName } = req.query;
+export const config = {
+  runtime: 'edge',
+};
 
-    try {
-        // Fetch group data from Supabase
-        const { data: group, error } = await supabase
-            .from('counter_groups')
-            .select('id, display_name, profile_image_url, created_at')
-            .eq('name', groupName)
-            .single();
+export default async function handler(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const groupName = url.pathname.split('/').pop();
 
-        if (error || !group) {
-            // Return default meta tags for non-existent groups
-            return res.status(200).send(`
-<!DOCTYPE html>
+  if (!groupName) {
+    return new Response('Group name is required', { status: 400 });
+  }
+
+  try {
+    // Fetch group data from Supabase
+    const { data: group, error } = await supabase
+      .from('counter_groups')
+      .select('id, display_name, profile_image_url, created_at')
+      .eq('name', groupName)
+      .single();
+
+    if (error || !group) {
+      // Return default meta tags for non-existent groups
+      const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -28,7 +36,7 @@ export default async function handler(req, res) {
     <meta property="og:title" content="VibeCount - Group Not Found">
     <meta property="og:description" content="This group does not exist or has been removed.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="${req.headers.host}/${groupName}">
+    <meta property="og:url" content="${url.origin}/${groupName}">
     <meta property="og:image" content="https://vibecount.vercel.app/static/images/image.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="VibeCount - Group Not Found">
@@ -41,19 +49,20 @@ export default async function handler(req, res) {
         window.location.href = '/${groupName}';
     </script>
 </body>
-</html>
-            `);
-        }
+</html>`;
+      return new Response(html, {
+        headers: { 'Content-Type': 'text/html' },
+      });
+    }
 
-        // Generate dynamic OpenGraph meta tags
-        const displayName = group.display_name || groupName;
-        const imageUrl =
-            group.profile_image_url ||
-            'https://vibecount.vercel.app/static/images/image.png';
-        const pageUrl = `${req.headers.host}/${groupName}`;
+    // Generate dynamic OpenGraph meta tags
+    const displayName = group.display_name || groupName;
+    const imageUrl =
+      group.profile_image_url ||
+      'https://vibecount.vercel.app/static/images/image.png';
+    const pageUrl = `${url.origin}/${groupName}`;
 
-        res.status(200).send(`
-<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -85,10 +94,13 @@ export default async function handler(req, res) {
         window.location.href = '/${groupName}';
     </script>
 </body>
-</html>
-        `);
-    } catch (error) {
-        console.error('Error generating OpenGraph tags:', error);
-        res.status(500).send('Error generating page');
-    }
+</html>`;
+
+    return new Response(html, {
+      headers: { 'Content-Type': 'text/html' },
+    });
+  } catch (error) {
+    console.error('Error generating OpenGraph tags:', error);
+    return new Response('Error generating page', { status: 500 });
+  }
 }
