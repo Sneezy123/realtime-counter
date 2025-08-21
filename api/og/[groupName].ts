@@ -10,6 +10,10 @@ export const config = {
 };
 
 export default async function handler(request: Request): Promise<Response> {
+
+    console.log('Incoming request:', request.url);
+  console.log('User-Agent:', request.headers.get('user-agent'));
+
   const url = new URL(request.url);
   const groupName = url.pathname.split('/').pop();
 
