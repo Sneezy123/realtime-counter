@@ -10,7 +10,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(discord-bot|facebookexternalhit|linkedinbot|naver-blueno|slacklinkexpandingbot|snapurlpreviewbot|twitterbot).*"
+          "value": ".*(discord-bot|facebookexternalhit|linkedinbot|naver-blueno|slacklinkexpandingbot|snapurlpreviewbot|twitterbot|opengraphxyzbot).*"
         }
       ],
       "destination": "/api/og/$1"
