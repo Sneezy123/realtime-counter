@@ -5,15 +5,15 @@
       "destination": "/api/og/[groupName]"
     },
     {
-      "source": "/([^?]*)",
+      "source": "/:groupName",
       "has": [
         {
           "type": "header",
           "key": "user-agent",
-          "value": "^(facebookexternalhit|Facebot|Twitterbot|Slackbot(?:-LinkExpanding)?|Discordbot|TelegramBot|WhatsApp|LinkedInBot|SkypeUriPreview|Pinterest(?:bot|/)|redditbot|vkShare|Tumblr|BitlyBot).*$"
+          "value": "^(facebookexternalhit|Facebot|Twitterbot|Slackbot(?:-LinkExpanding)?|Discordbot|TelegramBot|WhatsApp|LinkedInBot|SkypeUriPreview|Pinterest(?:bot|/)|redditbot|vkShare|Tumblr|BitlyBot|Googlebot|Google-InspectionTool).*$"
         }
       ],
-      "destination": "/api/og/$1"
+      "destination": "/api/og/:groupName"
     },
     {
       "source": "/(.*)",
