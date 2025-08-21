@@ -47,6 +47,10 @@ export default async function handler(request: Request): Promise<Response> {
     <meta name="twitter:description" content="This group does not exist or has been removed.">
     <meta name="twitter:image" content="https://vibecount.vercel.app/static/images/image.png">
 </head>
+<body>
+    <div id="root"></div>
+    <script src="/src/main.tsx" crossorigin="anonymous"></script>
+</body>
 </html>`;
       return new Response(html, {
         headers: { 'Content-Type': 'text/html' },
@@ -86,6 +90,10 @@ export default async function handler(request: Request): Promise<Response> {
     <meta name="twitter:image:alt" content="${displayName} on VibeCount">
     
 </head>
+<body>
+    <div id="root"></div>
+    <script src="/src/main.tsx" crossorigin="anonymous"></script>
+</body>
 </html>`;
 
     return new Response(html, {
