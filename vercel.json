@@ -1,12 +1,12 @@
 {
   "rewrites": [
+      {
+        "source": "/:groupName",
+        "destination": "/api/og/:groupName"
+      },
     {
       "source": "/api/og/:groupName",
       "destination": "/api/og/[groupName]"
-    },
-    {
-      "source": "/:groupName",
-      "destination": "/api/og/:groupName"
     },
     {
       "source": "/(.*)",
