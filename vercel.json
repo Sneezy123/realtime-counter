@@ -2,7 +2,7 @@
   "rewrites": [
     {
         "source": "/static/images/image.png",
-        "destination": "/og-image.png"
+        "destination": "/src/og-image.png"
     },
     {
       "source": "/api/og/:groupName",
