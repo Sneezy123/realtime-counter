@@ -6,13 +6,6 @@
     },
     {
       "source": "/:groupName",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "twitterbot"
-        }
-      ],
       "destination": "/api/og/:groupName"
     },
     {
