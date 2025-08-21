@@ -46,13 +46,7 @@ export default async function handler(request: Request): Promise<Response> {
     <meta name="twitter:title" content="VibeCount - Group Not Found">
     <meta name="twitter:description" content="This group does not exist or has been removed.">
     <meta name="twitter:image" content="https://vibecount.vercel.app/static/images/image.png">
-    <meta http-equiv="refresh" content="0;url=/${groupName}">
 </head>
-<body>
-    <script>
-        window.location.href = '/${groupName}';
-    </script>
-</body>
 </html>`;
       return new Response(html, {
         headers: { 'Content-Type': 'text/html' },
@@ -91,13 +85,7 @@ export default async function handler(request: Request): Promise<Response> {
     <meta name="twitter:image" content="${imageUrl}">
     <meta name="twitter:image:alt" content="${displayName} on VibeCount">
     
-    <meta http-equiv="refresh" content="0;url=/${groupName}">
 </head>
-<body>
-    <script>
-        window.location.href = '/${groupName}';
-    </script>
-</body>
 </html>`;
 
     return new Response(html, {
