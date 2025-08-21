@@ -48,8 +48,12 @@ export default async function handler(request: Request): Promise<Response> {
     <meta name="twitter:image" content="https://vibecount.vercel.app/static/images/image.png">
 </head>
 <body>
-    <div id="root"></div>
-    <script src="/src/main.tsx" crossorigin="anonymous"></script>
+<div id="root"></div>
+        <script
+            type="module"
+            src="/src/main.tsx"
+            crossorigin="anonymous"
+        ></script>
 </body>
 </html>`;
       return new Response(html, {
@@ -92,7 +96,11 @@ export default async function handler(request: Request): Promise<Response> {
 </head>
 <body>
     <div id="root"></div>
-    <script src="/src/main.tsx" crossorigin="anonymous"></script>
+        <script
+            type="module"
+            src="/src/main.tsx"
+            crossorigin="anonymous"
+        ></script>
 </body>
 </html>`;
 
