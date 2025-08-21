@@ -51,7 +51,7 @@ export default async function handler(request: Request): Promise<Response> {
 <div id="root"></div>
         <script
             type="module"
-            src="/src/main.tsx"
+            src="/assets/index-BhK3kama.js"
             crossorigin="anonymous"
         ></script>
 </body>
@@ -98,7 +98,7 @@ export default async function handler(request: Request): Promise<Response> {
     <div id="root"></div>
         <script
             type="module"
-            src="/src/main.tsx"
+            src="/assets/index-BhK3kama.js"
             crossorigin="anonymous"
         ></script>
 </body>
