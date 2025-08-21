@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/images/og-image.png",
-      "destination": "/og-image.png"
+        "source": "/static/images/image.png",
+        "destination": "/og-image.png"
     },
     {
       "source": "/api/og/:groupName",

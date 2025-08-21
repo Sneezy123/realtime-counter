@@ -29,11 +29,11 @@ export default async function handler(req, res) {
     <meta property="og:description" content="This group does not exist or has been removed.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="${req.headers.host}/${groupName}">
-    <meta property="og:image" content="https://vibecount.vercel.app/api/images/og-image.png">
+    <meta property="og:image" content="https://vibecount.vercel.app/static/images/image.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="VibeCount - Group Not Found">
     <meta name="twitter:description" content="This group does not exist or has been removed.">
-    <meta name="twitter:image" content="https://vibecount.vercel.app/api/images/og-image.png">
+    <meta name="twitter:image" content="https://vibecount.vercel.app/static/images/image.png">
     <meta http-equiv="refresh" content="0;url=/${groupName}">
 </head>
 <body>
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         const displayName = group.display_name || groupName;
         const imageUrl =
             group.profile_image_url ||
-            'https://vibecount.vercel.app/api/images/og-image.png';
+            'https://vibecount.vercel.app/static/images/image.png';
         const pageUrl = `${req.headers.host}/${groupName}`;
 
         res.status(200).send(`
