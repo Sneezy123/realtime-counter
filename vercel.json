@@ -10,7 +10,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(discord-bot|facebookexternalhit|linkedinbot|naver-blueno|slacklinkexpandingbot|snapurlpreviewbot|twitterbot|opengraphxyzbot).*"
+          "value": "^(facebookexternalhit|Facebot|Twitterbot|Slackbot(?:-LinkExpanding)?|Discordbot|TelegramBot|WhatsApp|LinkedInBot|SkypeUriPreview|Pinterest(?:bot|/)|redditbot|vkShare|Tumblr|BitlyBot)(?:.*)$"
         }
       ],
       "destination": "/api/og/$1"
