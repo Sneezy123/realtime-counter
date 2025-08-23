@@ -1,21 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/api/og/:groupName",
-      "destination": "/api/og/[groupName].ts"
-    },
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Telegram|Discordbot|Slackbot|Googlebot|Bingbot|DuckDuckBot|YandexBot|Applebot|facebook|twitter|linkedin|whatsapp|telegram|discord|slack).*"
-        }
-      ],
-      "destination": "/api/og/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
