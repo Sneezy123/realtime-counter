@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { hashAccessKey } from "./_utils";
+import { hashAccessKey } from "./_utils.js";
 
 const sql = neon(process.env.DATABASE_URL || process.env.POSTGRES_URL!);
 
@@ -78,10 +78,8 @@ export default async function handler(
   } catch (error) {
     console.error("API Groups error:", error);
     // Ensure we always return JSON even on error
-    return response
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    return response.status(500).json({
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }

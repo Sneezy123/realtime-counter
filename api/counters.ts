@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { verifyAccessById } from "./_utils";
+import { verifyAccessById } from "./_utils.js";
 
 const sql = neon(process.env.DATABASE_URL || process.env.POSTGRES_URL!);
 
@@ -95,10 +95,8 @@ export default async function handler(
     return response.status(405).json({ error: "Method not allowed" });
   } catch (error) {
     console.error("API Counters error:", error);
-    return response
-      .status(500)
-      .json({
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+    return response.status(500).json({
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
