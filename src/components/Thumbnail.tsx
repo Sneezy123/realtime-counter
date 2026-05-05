@@ -15,6 +15,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setInputUrl(url || "");
@@ -23,6 +24,12 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
     setImageLoaded(false);
     setIsLoading(true);
     setIsValidating(false);
+
+    // If image is cached, it's already complete
+    if (imageRef.current?.complete) {
+      setImageLoaded(true);
+      setIsLoading(false);
+    }
   }, [url]);
 
   const handleImageLoad = () => {
@@ -33,6 +40,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
   const handleImageError = () => {
     setError("Failed to load image");
     setIsLoading(false);
+    setImageLoaded(true); // Don't show skeleton on error
   };
   const validateImageUrl = async (imageUrl: string): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -161,6 +169,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
           )}
           <img
             key={url}
+            ref={imageRef}
             src={url}
             alt="Counter thumbnail"
             className={`w-full h-full object-contain transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
