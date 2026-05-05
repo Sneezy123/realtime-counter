@@ -10,7 +10,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputUrl, setInputUrl] = useState(url || "");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
@@ -20,26 +20,20 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
     setInputUrl(url || "");
     setPreviewUrl(null);
     setError(null);
-    // Force the component to re-detect load state by resetting it
     setImageLoaded(false);
+    setIsLoading(true);
     setIsValidating(false);
   }, [url]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
     setIsLoading(false);
-    setIsValidating(false);
   };
 
   const handleImageError = () => {
-    setError(
-      "Failed to load image - URL may be invalid or image may not exist",
-    );
+    setError("Failed to load image");
     setIsLoading(false);
-    setIsValidating(false);
-    setImageLoaded(false);
   };
-
   const validateImageUrl = async (imageUrl: string): Promise<boolean> => {
     return new Promise((resolve) => {
       // Create new abort controller for this validation
@@ -160,22 +154,19 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
     return (
       <div className="relative group mb-4">
         <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-800">
-          {!imageLoaded && !isValidating && (
-            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
-          )}
-          {isValidating && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <Loader2 size={24} className="text-white animate-spin" />
+          {(isLoading || !imageLoaded) && (
+            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse flex items-center justify-center">
+              <Loader2 size={24} className="text-gray-400 animate-spin" />
             </div>
           )}
           <img
             key={url}
             src={url}
             alt="Counter thumbnail"
-            className="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+            className={`w-full h-full object-contain transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+            onLoad={handleImageLoad}
             onError={handleImageError}
           />
-
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
             <button
               onClick={handleEditClick}
