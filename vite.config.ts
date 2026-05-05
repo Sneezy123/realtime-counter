@@ -4,11 +4,5 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/",
-  assetsInclude: ["**/*.html"],
   plugins: [react(), tailwindcss()],
-  // Removed exclude for lucide-react to fix module loading in Firefox
-  optimizeDeps: {
-    // exclude: ['lucide-react'],
-  },
 });
