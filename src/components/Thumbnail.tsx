@@ -172,10 +172,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ url, onUrlChange }) => {
             key={url}
             src={url}
             alt="Counter thumbnail"
-            className={`w-full h-full object-contain transition-all duration-200 group-hover:scale-105 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            onLoad={handleImageLoad}
+            className="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
             onError={handleImageError}
           />
 
