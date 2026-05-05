@@ -63,6 +63,22 @@ export const useRealTimeCounters = (
   const createCounter = useCallback(async () => {
     if (!groupId || !accessKey) return;
 
+    const tempId = Math.random().toString(36).substring(7);
+    const newCounter = {
+      id: tempId,
+      group_id: groupId,
+      name: "New Counter",
+      description: "",
+      value: 0,
+      increment_step: 1,
+      decrement_step: 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Optimistic update
+    setCounters((prev) => [...prev, newCounter as Counter]);
+
     try {
       const data = await apiFetch("/api/counters", {
         method: "POST",
@@ -76,11 +92,11 @@ export const useRealTimeCounters = (
           decrement_step: 1,
         }),
       });
-      console.log("Counter created:", data);
-      // setCounters(prev => [...prev, data]); // SSE will update this
+      // Replace temp with real
+      setCounters((prev) => prev.map((c) => (c.id === tempId ? data : c)));
       return data;
     } catch (err) {
-      console.error("Error creating counter:", err);
+      setCounters((prev) => prev.filter((c) => c.id !== tempId));
       setError(err instanceof Error ? err.message : "Failed to create counter");
       throw err;
     }
@@ -90,46 +106,41 @@ export const useRealTimeCounters = (
     async (counterId: string, updates: Partial<Counter>) => {
       if (!groupId || !accessKey) return;
 
+      const previousState = [...counters];
+
+      // Optimistic update
+      setCounters((prev) =>
+        prev.map((c) => (c.id === counterId ? { ...c, ...updates } : c)),
+      );
+
       try {
-        console.log("Updating counter:", counterId, updates);
-
-        const sanitizedUpdates: any = { ...updates };
-        if (updates.name) {
-          sanitizedUpdates.name = sanitizeInput(updates.name);
-        }
-        if (updates.description) {
-          sanitizedUpdates.description = sanitizeInput(updates.description);
-        }
-
-        const data = await apiFetch("/api/counters", {
+        await apiFetch("/api/counters", {
           method: "PATCH",
           body: JSON.stringify({
             id: counterId,
             groupId,
             accessKey,
-            ...sanitizedUpdates,
+            ...updates,
           }),
         });
-
-        console.log("Counter updated successfully:", data);
-        // setCounters(prev => prev.map(c => c.id === counterId ? data : c)); // SSE will update this
       } catch (err) {
-        console.error("Error updating counter:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to update counter",
-        );
+        // Rollback
+        setCounters(previousState);
+        setError("Failed to update counter");
         throw err;
       }
     },
-    [groupId, accessKey],
+    [groupId, accessKey, counters],
   );
 
   const deleteCounter = useCallback(
     async (counterId: string) => {
       if (!groupId || !accessKey) return;
 
+      const previousState = [...counters];
+      setCounters((prev) => prev.filter((c) => c.id !== counterId));
+
       try {
-        console.log("Deleting counter:", counterId);
         await apiFetch("/api/counters", {
           method: "DELETE",
           body: JSON.stringify({
@@ -138,20 +149,13 @@ export const useRealTimeCounters = (
             accessKey,
           }),
         });
-
-        console.log("Counter deleted successfully");
-        setCounters((prev) =>
-          prev.filter((counter) => counter.id !== counterId),
-        );
       } catch (err) {
-        console.error("Error deleting counter:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to delete counter",
-        );
+        setCounters(previousState);
+        setError("Failed to delete counter");
         throw err;
       }
     },
-    [groupId, accessKey],
+    [groupId, accessKey, counters],
   );
 
   const incrementCounter = useCallback(
