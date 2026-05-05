@@ -48,21 +48,23 @@ export const useRealTimeCounters = (
       if (data.counters) {
         setCounters((prev) => {
           const serverCounters = data.counters as Counter[];
-          const serverIds = new Set(serverCounters.map(c => c.id));
+          const serverIds = new Set(serverCounters.map((c) => c.id));
 
           // 1. Process server counters (merge updates, ignore if locally pending)
           const processed = serverCounters.map((incomingCounter: Counter) => {
             if (pendingUpdates.current[incomingCounter.id]) {
-              return prev.find(c => c.id === incomingCounter.id) || incomingCounter;
+              return (
+                prev.find((c) => c.id === incomingCounter.id) || incomingCounter
+              );
             }
             return incomingCounter;
           });
 
           // 2. Filter out items that are not on the server, BUT only if they are not being deleted locally
-          return processed.filter(c => serverIds.has(c.id) || pendingUpdates.current[c.id]);
+          return processed.filter(
+            (c) => serverIds.has(c.id) || pendingUpdates.current[c.id],
+          );
         });
-      }
-    };
       }
     };
 
