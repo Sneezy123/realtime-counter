@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Counter, apiFetch } from "./useSupabase";
 import { sanitizeInput } from "../utils/securityUtils";
 
@@ -9,6 +9,7 @@ export const useRealTimeCounters = (
   const [counters, setCounters] = useState<Counter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pendingUpdates = useRef<Record<string, boolean>>({});
 
   // Load initial counters
   useEffect(() => {
@@ -45,13 +46,28 @@ export const useRealTimeCounters = (
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.counters) {
-        setCounters(data.counters);
+        setCounters((prev) => {
+          const serverCounters = data.counters as Counter[];
+          const serverIds = new Set(serverCounters.map(c => c.id));
+
+          // 1. Process server counters (merge updates, ignore if locally pending)
+          const processed = serverCounters.map((incomingCounter: Counter) => {
+            if (pendingUpdates.current[incomingCounter.id]) {
+              return prev.find(c => c.id === incomingCounter.id) || incomingCounter;
+            }
+            return incomingCounter;
+          });
+
+          // 2. Filter out items that are not on the server, BUT only if they are not being deleted locally
+          return processed.filter(c => serverIds.has(c.id) || pendingUpdates.current[c.id]);
+        });
+      }
+    };
       }
     };
 
     eventSource.onerror = (err) => {
       console.error("SSE error:", err);
-      // eventSource.close(); // Browser usually reconnects automatically
     };
 
     return () => {
@@ -107,6 +123,7 @@ export const useRealTimeCounters = (
       if (!groupId || !accessKey) return;
 
       const previousState = [...counters];
+      pendingUpdates.current[counterId] = true;
 
       // Optimistic update
       setCounters((prev) =>
@@ -128,6 +145,10 @@ export const useRealTimeCounters = (
         setCounters(previousState);
         setError("Failed to update counter");
         throw err;
+      } finally {
+        setTimeout(() => {
+          delete pendingUpdates.current[counterId];
+        }, 500);
       }
     },
     [groupId, accessKey, counters],
@@ -138,6 +159,7 @@ export const useRealTimeCounters = (
       if (!groupId || !accessKey) return;
 
       const previousState = [...counters];
+      pendingUpdates.current[counterId] = true;
       setCounters((prev) => prev.filter((c) => c.id !== counterId));
 
       try {
@@ -153,6 +175,10 @@ export const useRealTimeCounters = (
         setCounters(previousState);
         setError("Failed to delete counter");
         throw err;
+      } finally {
+        setTimeout(() => {
+          delete pendingUpdates.current[counterId];
+        }, 500);
       }
     },
     [groupId, accessKey, counters],
