@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase, Counter } from './useSupabase';
-import { sanitizeInput } from '../utils/securityUtils';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { useState, useEffect, useCallback } from "react";
+import { Counter, apiFetch } from "./useSupabase";
+import { sanitizeInput } from "../utils/securityUtils";
 
-export const useRealTimeCounters = (groupId: string | null) => {
+export const useRealTimeCounters = (
+  groupId: string | null,
+  accessKey: string | null,
+) => {
   const [counters, setCounters] = useState<Counter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   // Load initial counters
   useEffect(() => {
@@ -19,17 +20,13 @@ export const useRealTimeCounters = (groupId: string | null) => {
     const loadCounters = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('counters')
-          .select('*')
-          .eq('group_id', groupId)
-          .order('created_at', { ascending: true });
-
-        if (error) throw error;
+        const data = await apiFetch(`/api/counters?groupId=${groupId}`);
         setCounters(data || []);
       } catch (err) {
-        console.error('Error loading counters:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load counters');
+        console.error("Error loading counters:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load counters",
+        );
       } finally {
         setLoading(false);
       }
@@ -38,165 +35,142 @@ export const useRealTimeCounters = (groupId: string | null) => {
     loadCounters();
   }, [groupId]);
 
-  // Set up real-time subscription
+  // Set up real-time subscription using SSE
   useEffect(() => {
     if (!groupId) return;
 
-    // Clean up existing subscription
-    if (channel) {
-      console.log('Cleaning up existing channel');
-      supabase.removeChannel(channel);
-    }
+    console.log("Setting up SSE for group:", groupId);
+    const eventSource = new EventSource(`/api/events?groupId=${groupId}`);
 
-    console.log('Setting up real-time subscription for group:', groupId);
-    
-    const newChannel = supabase
-      .channel(`counters-${groupId}`)
-      .on('postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'counters',
-          filter: `group_id=eq.${groupId}`
-        },
-        (payload: RealtimePostgresChangesPayload<Counter>) => {
-          console.log('Real-time update received:', payload);
-          
-          if (payload.eventType === 'INSERT' && payload.new) {
-            setCounters(prev => {
-              const exists = prev.find(c => c.id === payload.new.id);
-              if (exists) return prev;
-              return [...prev, payload.new as Counter];
-            });
-          } else if (payload.eventType === 'UPDATE') {
-            setCounters(prev =>
-              prev.map(counter =>
-                counter.id === payload.new?.id
-                  ? { ...counter, ...payload.new }
-                  : counter
-              )
-            );
-          } else if (payload.eventType === 'DELETE') {
-            setCounters(prev =>
-              prev.filter(counter => counter.id !== payload.old?.id)
-            );
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Subscription status:', status);
-      });
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.counters) {
+        setCounters(data.counters);
+      }
+    };
 
-    setChannel(newChannel);
+    eventSource.onerror = (err) => {
+      console.error("SSE error:", err);
+      // eventSource.close(); // Browser usually reconnects automatically
+    };
 
     return () => {
-      console.log('Unsubscribing from real-time updates');
-      if (newChannel) {
-        supabase.removeChannel(newChannel);
-      }
+      console.log("Closing SSE connection");
+      eventSource.close();
     };
   }, [groupId]);
 
   const createCounter = useCallback(async () => {
-    if (!groupId) return;
+    if (!groupId || !accessKey) return;
 
     try {
-      const { data, error } = await supabase
-        .from('counters')
-        .insert({
-          group_id: groupId,
-          name: 'New Counter',
-          description: '',
+      const data = await apiFetch("/api/counters", {
+        method: "POST",
+        body: JSON.stringify({
+          groupId,
+          accessKey,
+          name: "New Counter",
+          description: "",
           value: 0,
           increment_step: 1,
-          decrement_step: 1
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      console.log('Counter created:', data);
+          decrement_step: 1,
+        }),
+      });
+      console.log("Counter created:", data);
+      // setCounters(prev => [...prev, data]); // SSE will update this
       return data;
     } catch (err) {
-      console.error('Error creating counter:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create counter');
+      console.error("Error creating counter:", err);
+      setError(err instanceof Error ? err.message : "Failed to create counter");
       throw err;
     }
-  }, [groupId]);
+  }, [groupId, accessKey]);
 
-  const updateCounter = useCallback(async (
-    counterId: string,
-    updates: Partial<Counter>
-  ) => {
-    try {
-      console.log('Updating counter:', counterId, updates);
-      
-      // Sanitize text inputs only (not URL fields)
-      const sanitizedUpdates = { ...updates };
-      if (updates.name) {
-        sanitizedUpdates.name = sanitizeInput(updates.name);
+  const updateCounter = useCallback(
+    async (counterId: string, updates: Partial<Counter>) => {
+      if (!groupId || !accessKey) return;
+
+      try {
+        console.log("Updating counter:", counterId, updates);
+
+        const sanitizedUpdates: any = { ...updates };
+        if (updates.name) {
+          sanitizedUpdates.name = sanitizeInput(updates.name);
+        }
+        if (updates.description) {
+          sanitizedUpdates.description = sanitizeInput(updates.description);
+        }
+
+        const data = await apiFetch("/api/counters", {
+          method: "PATCH",
+          body: JSON.stringify({
+            id: counterId,
+            groupId,
+            accessKey,
+            ...sanitizedUpdates,
+          }),
+        });
+
+        console.log("Counter updated successfully:", data);
+        // setCounters(prev => prev.map(c => c.id === counterId ? data : c)); // SSE will update this
+      } catch (err) {
+        console.error("Error updating counter:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to update counter",
+        );
+        throw err;
       }
-      if (updates.description) {
-        sanitizedUpdates.description = sanitizeInput(updates.description);
+    },
+    [groupId, accessKey],
+  );
+
+  const deleteCounter = useCallback(
+    async (counterId: string) => {
+      if (!groupId || !accessKey) return;
+
+      try {
+        console.log("Deleting counter:", counterId);
+        await apiFetch("/api/counters", {
+          method: "DELETE",
+          body: JSON.stringify({
+            id: counterId,
+            groupId,
+            accessKey,
+          }),
+        });
+
+        console.log("Counter deleted successfully");
+        setCounters((prev) =>
+          prev.filter((counter) => counter.id !== counterId),
+        );
+      } catch (err) {
+        console.error("Error deleting counter:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to delete counter",
+        );
+        throw err;
       }
-      
-      // Handle thumbnail_url - ensure it's a string or null, don't sanitize URLs
-      if (updates.thumbnail_url !== undefined) {
-        sanitizedUpdates.thumbnail_url = updates.thumbnail_url || null;
-      }
+    },
+    [groupId, accessKey],
+  );
 
-      const { data, error } = await supabase
-        .from('counters')
-        .update(sanitizedUpdates)
-        .eq('id', counterId)
-        .select();
+  const incrementCounter = useCallback(
+    async (counter: Counter) => {
+      return updateCounter(counter.id, {
+        value: counter.value + (counter.increment_step || 1),
+      });
+    },
+    [updateCounter],
+  );
 
-      if (error) {
-        console.error('Supabase update error:', error);
-        throw error;
-      }
-      
-      console.log('Counter updated successfully:', data);
-    } catch (err) {
-      console.error('Error updating counter:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update counter');
-      throw err;
-    }
-  }, []);
-
-  const deleteCounter = useCallback(async (counterId: string) => {
-    try {
-      console.log('Deleting counter:', counterId);
-      const { error } = await supabase
-        .from('counters')
-        .delete()
-        .eq('id', counterId);
-
-      if (error) throw error;
-      console.log('Counter deleted successfully');
-      
-      // Optimistic update: remove from state immediately
-      setCounters(prev => prev.filter(counter => counter.id !== counterId));
-    } catch (err) {
-      console.error('Error deleting counter:', err);
-      setError(err instanceof Error ? err.message : 'Failed to delete counter');
-      throw err;
-    }
-  }, []);
-
-  const incrementCounter = useCallback(async (counter: Counter) => {
-    console.log('Incrementing counter:', counter.id);
-    return updateCounter(counter.id, {
-      value: counter.value + counter.increment_step
-    });
-  }, [updateCounter]);
-
-  const decrementCounter = useCallback(async (counter: Counter) => {
-    console.log('Decrementing counter:', counter.id);
-    return updateCounter(counter.id, {
-      value: counter.value - counter.decrement_step
-    });
-  }, [updateCounter]);
+  const decrementCounter = useCallback(
+    async (counter: Counter) => {
+      return updateCounter(counter.id, {
+        value: counter.value - (counter.decrement_step || 1),
+      });
+    },
+    [updateCounter],
+  );
 
   return {
     counters,
@@ -207,6 +181,6 @@ export const useRealTimeCounters = (groupId: string | null) => {
     deleteCounter,
     incrementCounter,
     decrementCounter,
-    clearError: () => setError(null)
+    clearError: () => setError(null),
   };
 };

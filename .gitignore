@@ -208,3 +208,5 @@ sketch
 
 
 .eslint.config.js
+.vercel
+.env*.local
